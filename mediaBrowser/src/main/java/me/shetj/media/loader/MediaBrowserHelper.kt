@@ -2,34 +2,40 @@ package me.shetj.media.loader
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Build
 import android.support.v4.media.MediaBrowserCompat
+import android.support.v4.media.session.PlaybackStateCompat
+import androidx.annotation.NonNull
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationManagerCompat
 import androidx.media.MediaBrowserServiceCompat
-import com.shetj.diyalbume.playVideo.media.notifications.MediaNotificationManager
+import me.shetj.media.MediaBrowserLoader
+import me.shetj.media.R
+import me.shetj.media.callback.NotificationHelper
+import me.shetj.media.notifications.MediaNotificationManager
+import me.shetj.media.callback.OnSubscribeCallBack
+import me.shetj.media.model.Music
+import java.util.concurrent.TimeUnit
 
-object MediaBrowserHelper{
-
-
-    fun init(context: Context?) {
-        requireNotNull(context) { "the provided context must not be null!" }
-    }
+internal object MediaBrowserHelper{
 
     /**
      * 通过不同的 parentMediaId ,使用不同的加载方式
      */
     private val mediaLoadDataCallBack = HashMap<String, OnSubscribeCallBack>()
-    private var onCreateChannel: OnCreateChannel?=null
+    private var notificationHelper: NotificationHelper?=null
 
-    fun setOnCreateChannel(onCreateChannel: OnCreateChannel){
-        MediaBrowserHelper.onCreateChannel = onCreateChannel
+    fun setNotificationHelper(notificationHelper: NotificationHelper){
+        this.notificationHelper = notificationHelper
     }
 
-
-    fun onLoadChildren(parentMediaId: String, result: MediaBrowserServiceCompat.Result<List<MediaBrowserCompat.MediaItem>>) {
+   internal fun onLoadChildren(parentMediaId: String, result: MediaBrowserServiceCompat.Result<List<MediaBrowserCompat.MediaItem>>) {
         val callBack = mediaLoadDataCallBack[parentMediaId]
         callBack?.let {
             callBack.onLoadChildren(parentMediaId, result)
@@ -44,13 +50,47 @@ object MediaBrowserHelper{
         mediaLoadDataCallBack.remove(parentMediaId)
     }
 
+    /*********************************************** model 内使用的方法 ****************************************************************/
+
+    internal fun checkParentId(parentId: String): Boolean {
+       return  null != mediaLoadDataCallBack[parentId]
+    }
+
+
+    internal fun getAlbumBitmap(mContext: Context, mediaId: String): Bitmap? {
+        if (notificationHelper != null){
+            return  notificationHelper?.getAlbumBitmap(mContext, mediaId)
+        }
+        return  BitmapFactory.decodeResource(mContext.resources,
+            if (MediaBrowserLoader.getMediaController()?.playbackState?.state
+                == PlaybackStateCompat.STATE_PLAYING)
+                R.drawable.ic_media_with_pause else R.drawable.ic_media_with_play)
+    }
+    internal fun createContentIntent(mContext: Context): PendingIntent {
+        return notificationHelper?.createContentIntent() ?: defCreateContentIntent(mContext)
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
-    fun createChannel(mContext: Context) {
-        if (onCreateChannel != null){
-            onCreateChannel!!.createChannel(mContext)
+    internal fun createChannel(mContext: Context) {
+        if (notificationHelper != null){
+            notificationHelper!!.createChannel(mContext)
         }else{
             defCreateChannel(mContext)
         }
+    }
+
+    @NonNull
+    internal fun createMediaItemAlbum(@NonNull music: Music): MediaBrowserCompat.MediaItem {
+        val mediaMetadataCompat = MetadataUtil.getMediaMetadataCompat(
+            mediaId = music.name!!,
+            album = music.img!!,
+            duration = music.duration,
+            durationUnit = TimeUnit.MILLISECONDS,
+            genre = "1",
+            title = music.name!!
+            , fileUrl = music.url!!
+        )
+        return MediaBrowserCompat.MediaItem(mediaMetadataCompat.description, MediaBrowserCompat.MediaItem.FLAG_PLAYABLE)
     }
 
     /*********************************************** 私有方法 ****************************************************************/
@@ -72,14 +112,14 @@ object MediaBrowserHelper{
         }
     }
 
-    /*********************************************** 接口部分 ****************************************************************/
-
-    interface OnSubscribeCallBack{
-       fun onLoadChildren(parentMediaId: String, result: MediaBrowserServiceCompat.Result<List<MediaBrowserCompat.MediaItem>>)
+    private fun defCreateContentIntent(mContext: Context): PendingIntent {
+        val openUI =
+            mContext.packageManager.getLaunchIntentForPackage(mContext.packageName)
+        openUI?.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+        return PendingIntent.getActivity(
+            mContext, MediaNotificationManager.REQUEST_CODE, openUI, PendingIntent.FLAG_CANCEL_CURRENT)
     }
 
-    interface OnCreateChannel{
-        fun createChannel(mContext: Context)
-    }
+
 
 }

@@ -4,8 +4,9 @@
     package="me.shetj.media" >
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" /> <!-- startForeground need it -->
     <application
-      >
+        >
         <service android:name=".service.MusicService"
           >
             <intent-filter>

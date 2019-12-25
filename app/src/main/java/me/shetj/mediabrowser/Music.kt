@@ -1,9 +1,9 @@
-package me.shetj.media.model
+package me.shetj.mediabrowser
 
 import androidx.annotation.Keep
 
 @Keep
-internal  class Music {
+class Music {
     var name: String ?=null
     var size: Long = 0
     var url: String?=null

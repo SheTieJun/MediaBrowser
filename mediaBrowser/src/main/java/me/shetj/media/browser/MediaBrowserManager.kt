@@ -17,6 +17,7 @@
 package me.shetj.media.browser
 
 
+import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Context
 import android.os.RemoteException
@@ -26,6 +27,7 @@ import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
+import me.shetj.media.callback.OnMediaStatusChangeListener
 import me.shetj.media.service.MusicService
 import java.util.*
 
@@ -33,9 +35,10 @@ import java.util.*
  * MediaBrowserManager for a MediaBrowser that handles connecting, disconnecting,
  * and basic browsing.
  */
-class MediaBrowserManager private constructor(val mContext: Context) {
+internal class MediaBrowserManager private constructor(val mContext: Context) {
 
     companion object {
+        @SuppressLint("StaticFieldLeak")
         private var browserManager :MediaBrowserManager ?=null
 
         fun getInstance(context:Context) :MediaBrowserManager {
@@ -66,6 +69,10 @@ class MediaBrowserManager private constructor(val mContext: Context) {
             }
             return mMediaController!!.transportControls
         }
+
+    fun getMediaController(): MediaControllerCompat ?{
+        return mMediaController
+    }
 
     // ########################################音频变化回调 管理列表###################################################
 
@@ -112,6 +119,9 @@ class MediaBrowserManager private constructor(val mContext: Context) {
         Log.i("MediaBrowserManager","onStop: Releasing MediaController, Disconnecting from MediaBrowser")
     }
 
+    fun subscribe(parentId:String){
+        mMediaBrowserCompat?.subscribe(parentId,mMediaBrowserSubscriptionCallback)
+    }
 
     // ############################################onConnected CallBack################################################
 
@@ -195,6 +205,11 @@ class MediaBrowserManager private constructor(val mContext: Context) {
      */
     inner class MediaControllerCallback : MediaControllerCompat.Callback() {
 
+        override fun onSessionReady() {
+            super.onSessionReady()
+
+        }
+
         override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
             for (callback in mMediaStatusChangeListenerList) {
                 callback.onMetadataChanged(metadata)
@@ -203,7 +218,7 @@ class MediaBrowserManager private constructor(val mContext: Context) {
 
         override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
             for (callback in mMediaStatusChangeListenerList) {
-                callback.onPlaybackStateChanged(state!!)
+                callback.onPlaybackStateChanged(state)
             }
         }
 
@@ -212,6 +227,23 @@ class MediaBrowserManager private constructor(val mContext: Context) {
             for (callback in mMediaStatusChangeListenerList) {
                 callback.onQueueChanged(queue)
             }
+        }
+
+        override fun onRepeatModeChanged(repeatMode: Int) {
+            super.onRepeatModeChanged(repeatMode)
+
+        }
+
+        override fun onAudioInfoChanged(info: MediaControllerCompat.PlaybackInfo?) {
+            super.onAudioInfoChanged(info)
+        }
+
+        override fun onQueueTitleChanged(title: CharSequence?) {
+            super.onQueueTitleChanged(title)
+        }
+
+        override fun onCaptioningEnabledChanged(enabled: Boolean) {
+            super.onCaptioningEnabledChanged(enabled)
         }
 
         // service被杀死时调用
@@ -240,29 +272,6 @@ class MediaBrowserManager private constructor(val mContext: Context) {
     }
 
 
-    /**
-     * 音频变化回调
-     */
-    interface OnMediaStatusChangeListener {
-        fun connectionCallback(isSuccess: Boolean)
-        /**
-         * 播放状态修改
-         */
-        fun onPlaybackStateChanged(state: PlaybackStateCompat)
-
-        /**
-         * 当前播放歌曲信息修改
-         */
-        fun onMetadataChanged(metadata: MediaMetadataCompat?)
-
-        /**
-         * 播放队列修改
-         */
-        fun onQueueChanged(queue: List<MediaSessionCompat.QueueItem>?)
-
-        fun onChildrenLoaded(parentId: String,
-                             children: List<MediaBrowserCompat.MediaItem>)
-    }
 
 
 }

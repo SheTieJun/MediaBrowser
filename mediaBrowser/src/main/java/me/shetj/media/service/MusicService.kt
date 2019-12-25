@@ -25,11 +25,12 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.media.MediaBrowserServiceCompat
 import androidx.media.session.MediaButtonReceiver
-import com.shetj.diyalbume.playVideo.media.notifications.MediaNotificationManager
-import com.shetj.diyalbume.playVideo.media.notifications.MediaNotificationManager.Companion.NOTIFICATION_ID
+import me.shetj.media.notifications.MediaNotificationManager
+import me.shetj.media.notifications.MediaNotificationManager.Companion.NOTIFICATION_ID
 import me.shetj.media.callback.MediaSessionCallback
 import me.shetj.media.callback.PlayInfoCallback
 import me.shetj.media.MediaBrowserLoader
+import me.shetj.media.loader.MediaBrowserHelper
 import me.shetj.media.loader.MetadataUtil
 import me.shetj.media.player.MediaPlayerManager
 
@@ -83,7 +84,7 @@ class MusicService : MediaBrowserServiceCompat() {
             result: Result<List<MediaBrowserCompat.MediaItem>>) {
 
         //通过不同的parentId,获取不同的列表
-        MediaBrowserLoader.onLoadChildren(parentMediaId,result)
+        MediaBrowserHelper.onLoadChildren(parentMediaId,result)
     }
 
 
@@ -93,7 +94,7 @@ class MusicService : MediaBrowserServiceCompat() {
     /**
      * MediaPlayer 播放状态回调
      */
-    inner class MediaPlayerListener : PlayInfoCallback() {
+   internal inner class MediaPlayerListener : PlayInfoCallback() {
 
 
         override fun onPlaybackStateChange(state: PlaybackStateCompat?) {

@@ -1,6 +1,7 @@
 package me.shetj.mediabrowser
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.support.v4.media.MediaBrowserCompat
 
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -31,8 +32,8 @@ class MusicAdapter(data: List<MediaBrowserCompat.MediaItem>?) : BaseQuickAdapter
         helper.setText(R.id.tv_music_name, item.description.title)
                 .addOnClickListener(R.id.tv_play)
                 .setTextColor(R.id.tv_music_name,when(itemPosition == position){
-                    true -> R.color.red
-                    false -> R.color.textColor
+                    true ->  Color.RED
+                    false -> Color.BLACK
                 } )
     }
 

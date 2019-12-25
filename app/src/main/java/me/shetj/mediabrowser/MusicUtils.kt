@@ -4,7 +4,6 @@ import android.content.Context
 import android.provider.MediaStore
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
-import me.shetj.media.model.Music
 import java.util.*
 
 

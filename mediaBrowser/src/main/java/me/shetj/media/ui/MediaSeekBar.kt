@@ -57,7 +57,6 @@ class MediaSeekBar : AppCompatSeekBar {
 
     /**
      * 开始
-     *
      * @param start
      * @param end
      * @param duration
@@ -86,7 +85,8 @@ class MediaSeekBar : AppCompatSeekBar {
      *
      * @param valueAnimator
      */
-    fun onProgressUpdate(valueAnimator: ValueAnimator) { // If the user is changing the slider, cancel the animation.
+    fun onProgressUpdate(valueAnimator: ValueAnimator) {
+        // If the user is changing the slider, cancel the animation.
         if (mIsTracking) {
             valueAnimator.cancel()
             return

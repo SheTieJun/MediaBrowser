@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package com.shetj.diyalbume.playVideo.media.notifications
+package me.shetj.media.notifications
 
 
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.os.Build
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
@@ -32,14 +31,13 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.media.session.MediaButtonReceiver
 import me.shetj.media.R
-import me.shetj.media.MediaBrowserLoader
 import me.shetj.media.loader.MediaBrowserHelper
 
 /**
  * Keeps track of a notification and updates it automatically for a given MediaSession. This is
  * required so that the music service don't get killed during playback.
  */
-class MediaNotificationManager(private val mContext: Context) {
+internal class MediaNotificationManager(private val mContext: Context) {
 
 
     private val mPlayAction: NotificationCompat.Action = NotificationCompat.Action(
@@ -122,7 +120,7 @@ class MediaNotificationManager(private val mContext: Context) {
                 .setContentIntent(createContentIntent())
                 .setContentTitle(description.title)
                 .setContentText(description.subtitle)
-//                .setLargeIcon(MetadataUtil.getAlbumBitmap(mContext, description.mediaId!!))
+                .setLargeIcon(MediaBrowserHelper.getAlbumBitmap(mContext, description.mediaId!!))
                 .setDeleteIntent(MediaButtonReceiver.buildMediaButtonPendingIntent(
                         mContext, PlaybackStateCompat.ACTION_STOP))
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -136,17 +134,13 @@ class MediaNotificationManager(private val mContext: Context) {
     }
 
     private fun createContentIntent(): PendingIntent {
-//        val openUI = Intent(mContext, MainActivity::class.java)
-        val openUI = Intent()
-        openUI.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-        return PendingIntent.getActivity(
-                mContext, REQUEST_CODE, openUI, PendingIntent.FLAG_CANCEL_CURRENT)
+        return MediaBrowserHelper.createContentIntent(mContext)
     }
 
     companion object {
         const val NOTIFICATION_ID = 412
         internal const val CHANNEL_ID = "me.shetj.media"
-        private const val REQUEST_CODE = 501
+        internal const val REQUEST_CODE = 501
     }
 
 }

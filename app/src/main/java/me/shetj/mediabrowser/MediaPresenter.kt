@@ -12,7 +12,6 @@ import me.shetj.base.base.IView
 import me.shetj.base.kt.getRxPermissions
 import me.shetj.base.tools.app.ArmsUtils
 import me.shetj.base.tools.app.ArmsUtils.Companion.getMessage
-import me.shetj.media.model.Music
 import java.util.ArrayList
 
 class MediaPresenter(view:IView) :BasePresenter<MediaModel>(view){

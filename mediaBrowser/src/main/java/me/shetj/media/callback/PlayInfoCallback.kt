@@ -19,7 +19,7 @@ import android.support.v4.media.session.PlaybackStateCompat
 
 /**
  */
-abstract class PlayInfoCallback {
+internal abstract class PlayInfoCallback {
     /**
      * 播放状态变化
      *

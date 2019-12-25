@@ -19,7 +19,7 @@ import java.util.ArrayList
  * 用户对UI的操作将最终回调到这里。通过MediaSessionCallback 操作播放器
  * The callback class will receive all the user's actions, like play, pause, etc;
  */
-class MediaSessionCallback(private val context: Context,
+internal class MediaSessionCallback(private val context: Context,
                            private val mMediaSessionCompat: MediaSessionCompat,
                            private val mMediaPlayerManager: MediaPlayerManager,
                            mQueueIndex: Int) : MediaSessionCompat.Callback() {

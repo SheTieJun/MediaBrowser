@@ -28,7 +28,7 @@ import me.shetj.media.loader.MetadataUtil
 /**
  * Exposes the functionality of the [MediaPlayer] and implements the [PlayerAdapter]
  */
-class MediaPlayerManager (context: Context,
+internal class MediaPlayerManager (context: Context,
                           private val mPlaybackInfoListener: PlayInfoCallback
 )
     : PlayerAdapter(context) {
@@ -57,12 +57,6 @@ class MediaPlayerManager (context: Context,
     override val isPlaying: Boolean
         get() = mMediaPlayer != null && mMediaPlayer!!.isPlaying
 
-    /**
-     * Set the current capabilities available on this session. Note: If a capability is not
-     * listed in the bitmask of capabilities then the MediaSession will not handle it. For
-     * example, if you don't want ACTION_STOP to be handled by the MediaSession, then don't
-     * included it in the bitmask that's returned.
-     */
     private val availableActions: Long
         @PlaybackStateCompat.Actions
         get() {
