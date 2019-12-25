@@ -10,6 +10,8 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Build
 import android.support.v4.media.MediaBrowserCompat
+import android.support.v4.media.session.MediaControllerCompat
+import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.annotation.NonNull
 import androidx.annotation.RequiresApi
@@ -24,7 +26,6 @@ import me.shetj.media.model.Music
 import java.util.concurrent.TimeUnit
 
 internal object MediaBrowserHelper{
-
     /**
      * 通过不同的 parentMediaId ,使用不同的加载方式
      */
@@ -66,8 +67,11 @@ internal object MediaBrowserHelper{
                 == PlaybackStateCompat.STATE_PLAYING)
                 R.drawable.ic_media_with_pause else R.drawable.ic_media_with_play)
     }
-    internal fun createContentIntent(mContext: Context): PendingIntent {
-        return notificationHelper?.createContentIntent() ?: defCreateContentIntent(mContext)
+    internal fun createContentIntent(
+        mContext: Context,
+        token: MediaSessionCompat.Token
+    ): PendingIntent {
+        return notificationHelper?.createContentIntent() ?: defCreateContentIntent(mContext,token)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -112,12 +116,19 @@ internal object MediaBrowserHelper{
         }
     }
 
-    private fun defCreateContentIntent(mContext: Context): PendingIntent {
-        val openUI =
-            mContext.packageManager.getLaunchIntentForPackage(mContext.packageName)
-        openUI?.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-        return PendingIntent.getActivity(
-            mContext, MediaNotificationManager.REQUEST_CODE, openUI, PendingIntent.FLAG_CANCEL_CURRENT)
+    private fun defCreateContentIntent(
+        mContext: Context,
+        token: MediaSessionCompat.Token
+    ): PendingIntent {
+        val controller = MediaControllerCompat(mContext, token)
+        if (controller.sessionActivity == null){
+            val openUI =
+                mContext.packageManager.getLaunchIntentForPackage(mContext.packageName)
+            openUI?.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+            return PendingIntent.getActivity(
+                mContext, MediaNotificationManager.REQUEST_CODE, openUI, PendingIntent.FLAG_CANCEL_CURRENT)
+        }
+        return controller.sessionActivity
     }
 
 

@@ -35,27 +35,31 @@ import java.util.*
  * MediaBrowserManager for a MediaBrowser that handles connecting, disconnecting,
  * and basic browsing.
  */
-internal class MediaBrowserManager private constructor(val mContext: Context) {
+internal class MediaBrowserManager private constructor() {
 
     companion object {
         @SuppressLint("StaticFieldLeak")
         private var browserManager :MediaBrowserManager ?=null
 
-        fun getInstance(context:Context) :MediaBrowserManager {
+        fun getInstance() :MediaBrowserManager {
             if (browserManager == null){
-                browserManager = MediaBrowserManager(context.applicationContext)
+                browserManager = MediaBrowserManager()
             }
             return browserManager!!
         }
 
     }
 
+    private var mContext:Context ? = null
     private var mMediaBrowserCompat: MediaBrowserCompat? = null
     private var mMediaController: MediaControllerCompat? = null
     private val mMediaBrowserConnectionCallback = MediaBrowserConnectionCallback()
     private val mMediaControllerCallback = MediaControllerCallback()
     private val mMediaBrowserSubscriptionCallback = MediaBrowserSubscriptionCallback()
-
+    /**
+     * 音频变化回调 管理列表
+     */
+    private val mMediaStatusChangeListenerList = ArrayList<OnMediaStatusChangeListener>()
 
     /**
      * 获取播放控制器 通过该方法控制播放
@@ -76,15 +80,12 @@ internal class MediaBrowserManager private constructor(val mContext: Context) {
 
     // ########################################音频变化回调 管理列表###################################################
 
-    /**
-     * 音频变化回调 管理列表
-     */
-    private val mMediaStatusChangeListenerList = ArrayList<OnMediaStatusChangeListener>()
 
     /**
      * 跟随Activity的生命周期
      */
-    fun onStart() {
+    fun onStart(mContext: Context) {
+        this.mContext = mContext
         if (mMediaBrowserCompat == null) {
             // 创建MediaBrowserCompat
             mMediaBrowserCompat = MediaBrowserCompat(
@@ -95,10 +96,6 @@ internal class MediaBrowserManager private constructor(val mContext: Context) {
                 mMediaBrowserConnectionCallback, null)//
             // 链接service
             mMediaBrowserCompat!!.connect()
-        }else{
-            for (callback in mMediaStatusChangeListenerList) {
-                callback.connectionCallback(true)
-            }
         }
         Log.i("MediaBrowserManager","onStart: Creating MediaBrowser, and connecting")
     }
@@ -115,6 +112,7 @@ internal class MediaBrowserManager private constructor(val mContext: Context) {
             mMediaBrowserCompat!!.disconnect()
             mMediaBrowserCompat = null
         }
+        mContext = null
         // 数据置空
         Log.i("MediaBrowserManager","onStop: Releasing MediaController, Disconnecting from MediaBrowser")
     }

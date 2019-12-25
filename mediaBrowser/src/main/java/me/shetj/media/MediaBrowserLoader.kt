@@ -20,9 +20,9 @@ object MediaBrowserLoader{
     private val isStart = AtomicBoolean(false)
 
     @JvmStatic
-    fun initAndStart(context: Context?) :MediaBrowserLoader{
-        init(context)
-        start()
+    fun initAndStart(context: Context) :MediaBrowserLoader{
+        init()
+        start(context)
         return this
     }
 
@@ -30,10 +30,9 @@ object MediaBrowserLoader{
      * 初始化，必须执行的方法
      */
     @JvmStatic
-    fun init(context: Context?) :MediaBrowserLoader{
+    fun init() :MediaBrowserLoader{
         if (!isInit.get()) {
-            requireNotNull(context) { "the provided context must not be null!" }
-            browserManager = MediaBrowserManager.getInstance(context.applicationContext)
+            browserManager = MediaBrowserManager.getInstance()
             isInit.compareAndSet(false,true)
         }
         return this
@@ -43,9 +42,9 @@ object MediaBrowserLoader{
      * 开始服务
      */
     @JvmStatic
-    fun start(){
+    fun start(context: Context){
         checkLoaderInit()
-        browserManager.onStart()
+        browserManager.onStart(context)
         isStart.compareAndSet(false,true)
     }
 

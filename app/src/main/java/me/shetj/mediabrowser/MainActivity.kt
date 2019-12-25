@@ -21,6 +21,7 @@ import me.shetj.media.loader.MetadataUtil
 import timber.log.Timber
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
 
 class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener {
 
@@ -50,16 +51,11 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
     }
 
     override fun initView() {
-
-
-        MediaBrowserLoader.init(this)
+        MediaBrowserLoader.init()
             .addOnMediaStatusListener(this)
             .addMediaLoadDataCallBack(parentId,object :OnSubscribeCallBack{
                 override fun onLoadChildren(parentMediaId: String,
                     result: MediaBrowserServiceCompat.Result<List<MediaBrowserCompat.MediaItem>>) {
-                    when(parentMediaId)
-                    {
-                        parentId ->{
                             MusicUtils.loadFileData(rxContext).map {
                                 val mediaItems = ArrayList<MediaBrowserCompat.MediaItem>()
                                 it.apply {
@@ -72,11 +68,11 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
                                 result.sendResult(it)
                             },{
                                 Timber.e(it)
+                                result.sendResult(null)
                             })
-                        }
-                    }
+
                 }
-            }).start()
+            }).start(this)
     }
 
     private fun createMediaItemAlbum(music: Music): MediaBrowserCompat.MediaItem {
@@ -107,6 +103,7 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
     }
 
     override fun connectionCallback(isSuccess: Boolean) {
+        Timber.w("connectionCallback:$isSuccess")
         if (isSuccess){
             getRxPermissions().request(android.Manifest.permission.READ_EXTERNAL_STORAGE
                 ,android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -120,6 +117,7 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
 
 
     override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
+        Timber.w("onPlaybackStateChanged")
         //音乐播放状态改变回调
         when (state?.state) {
             PlaybackStateCompat.STATE_NONE -> "需要点击开始".showToast()
@@ -130,6 +128,7 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
     }
 
     override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
+        Timber.w("onMetadataChanged")
         metadata?.let {
             mAdapter.selectMediaId(it.description.mediaId)
         }
@@ -166,6 +165,6 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
     override fun onDestroy() {
         super.onDestroy()
         MediaBrowserLoader.removeOnMediaStatusListener(this)
-//        MediaBrowserLoader.stop()
+        MediaBrowserLoader.stop()
     }
 }

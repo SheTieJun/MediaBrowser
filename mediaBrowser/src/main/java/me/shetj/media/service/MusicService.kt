@@ -82,12 +82,21 @@ class MusicService : MediaBrowserServiceCompat() {
     override fun onLoadChildren(
             parentMediaId: String,
             result: Result<List<MediaBrowserCompat.MediaItem>>) {
-
         //通过不同的parentId,获取不同的列表
         MediaBrowserHelper.onLoadChildren(parentMediaId,result)
     }
 
 
+    /**
+     * Returns a list of [MediaItem]s that match the given search query
+     */
+    override fun onSearch(
+        query: String,
+        extras: Bundle?,
+        result: Result<List<MediaBrowserCompat.MediaItem>>
+    ) {
+
+    }
 
 
 

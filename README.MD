@@ -8,9 +8,9 @@ Android 媒体播放框架MediaSession 的封装使用，简化学习使用成�
 2. 自定义加载数据（通过parentID）
 3. 可以简单自定义Notification的一些参数
 
-### 初始化以及开始
+### [初始化以及开始](./app/src/main/java/me/shetj/mediabrowser/MainActivity.kt) 
 ```
-      MediaBrowserLoader.init(this) //必须执行
+      MediaBrowserLoader.init() //必须执行
                 .addOnMediaStatusListener(this)
                 .addMediaLoadDataCallBack("id",object :OnSubscribeCallBack{
                 override fun onLoadChildren(parentMediaId: String,
@@ -34,7 +34,7 @@ Android 媒体播放框架MediaSession 的封装使用，简化学习使用成�
                         }
                     }
                 }
-            }).start()
+            }).start(this)
 ```
 
 
@@ -43,7 +43,10 @@ Android 媒体播放框架MediaSession 的封装使用，简化学习使用成�
  MediaBrowserLoader.stop()
 ```
 [具体方法](./mediaBrowser/src/main/java/me/shetj/media/MediaBrowserLoader.kt)
-
+获取时间
+```
+long currentPosition = ((SystemClock.elapsedRealtime() – playbackState.getLastPositionUpdateTime() ) * playbackState. getPlaybackSpeed() ) + playbackState.getPosition();
+```
 ### 注意点
 如果使用本地文件，并且>= 29
 请在AndroidManifest.xml

@@ -65,7 +65,8 @@ internal class MediaNotificationManager(private val mContext: Context) {
             MediaButtonReceiver.buildMediaButtonPendingIntent(
                     mContext,
                     PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS))
-
+    private val stopPendingIntent =
+        MediaButtonReceiver.buildMediaButtonPendingIntent(mContext, PlaybackStateCompat.ACTION_STOP)
     init {
         NotificationManagerCompat.from(mContext).cancelAll()
     }
@@ -87,7 +88,6 @@ internal class MediaNotificationManager(private val mContext: Context) {
                                   token: MediaSessionCompat.Token,
                                   isPlaying: Boolean,
                                   description: MediaDescriptionCompat): NotificationCompat.Builder {
-
         // Create the (mandatory) notification channel when running on Android Oreo.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createChannel()
@@ -108,23 +108,23 @@ internal class MediaNotificationManager(private val mContext: Context) {
 
         val mediaStyle = androidx.media.app.NotificationCompat.MediaStyle()
                 .setMediaSession(token)
-                .setShowActionsInCompactView(position)
+            .setShowActionsInCompactView(position)
                 .setShowCancelButton(true)
                 .setCancelButtonIntent(
                         MediaButtonReceiver.buildMediaButtonPendingIntent(
                                 mContext,
                                 PlaybackStateCompat.ACTION_STOP))
         builder.setStyle(mediaStyle)
-                .setColor(ContextCompat.getColor(mContext, R.color.notification_bg))
+            .setColor(ContextCompat.getColor(mContext, R.color.notification_bg))
                 .setSmallIcon(R.drawable.ic_stat_image_audiotrack)
-                .setContentIntent(createContentIntent())
+                .setContentIntent(createContentIntent(token))
+                .setDeleteIntent(stopPendingIntent)
                 .setContentTitle(description.title)
                 .setContentText(description.subtitle)
                 .setLargeIcon(MediaBrowserHelper.getAlbumBitmap(mContext, description.mediaId!!))
                 .setDeleteIntent(MediaButtonReceiver.buildMediaButtonPendingIntent(
                         mContext, PlaybackStateCompat.ACTION_STOP))
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-
         return builder
     }
 
@@ -133,8 +133,10 @@ internal class MediaNotificationManager(private val mContext: Context) {
         MediaBrowserHelper.createChannel(mContext)
     }
 
-    private fun createContentIntent(): PendingIntent {
-        return MediaBrowserHelper.createContentIntent(mContext)
+    private fun createContentIntent(
+        token: MediaSessionCompat.Token
+    ): PendingIntent {
+        return MediaBrowserHelper.createContentIntent(this.mContext,token)
     }
 
     companion object {
