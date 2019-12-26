@@ -25,6 +25,8 @@ interface OnMediaStatusChangeListener {
      */
     fun onQueueChanged(queue: List<MediaSessionCompat.QueueItem>?)
 
-    fun onChildrenLoaded(parentId: String,
-                         children: List<MediaBrowserCompat.MediaItem>)
+    /**
+     * 获取数据成功回调
+     */
+    fun onChildrenLoaded(parentId: String, children: List<MediaBrowserCompat.MediaItem>)
 }

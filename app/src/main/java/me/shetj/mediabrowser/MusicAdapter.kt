@@ -6,6 +6,7 @@ import android.support.v4.media.MediaBrowserCompat
 
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
+import timber.log.Timber
 
 class MusicAdapter(data: List<MediaBrowserCompat.MediaItem>?) : BaseQuickAdapter<MediaBrowserCompat.MediaItem, BaseViewHolder>(R.layout.item_select_music2, data) {
 
@@ -41,6 +42,7 @@ class MusicAdapter(data: List<MediaBrowserCompat.MediaItem>?) : BaseQuickAdapter
      * 设置选中的位置
      */
     fun setSelectPosition(targetPos: Int) {
+        Timber.i("setSelectPosition=$position")
         //如果不相等，说明有变化
         if (position != targetPos) {
             val old: Int = position

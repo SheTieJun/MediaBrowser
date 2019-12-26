@@ -8,6 +8,13 @@ Android 媒体播放框架MediaSession 的封装使用，简化学习使用成�
 2. 自定义加载数据（通过parentID）
 3. 可以简单自定义Notification的一些参数
 
+
+
+```
+    implementation 'androidx.media:media:1.1.0'
+```
+
+
 ### [初始化以及开始](./app/src/main/java/me/shetj/mediabrowser/MainActivity.kt) 
 ```
       MediaBrowserLoader.init() //必须执行

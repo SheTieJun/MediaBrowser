@@ -39,6 +39,7 @@ import me.shetj.media.player.MediaPlayerManager
  * MediaBrowserServiceCompat
  */
 class MusicService : MediaBrowserServiceCompat() {
+
     private var mMediaPlayerManager: MediaPlayerManager? = null
     private var mMediaNotificationManager: MediaNotificationManager? = null
     private var mServiceInStartedState: Boolean = false
@@ -105,7 +106,6 @@ class MusicService : MediaBrowserServiceCompat() {
      */
    internal inner class MediaPlayerListener : PlayInfoCallback() {
 
-
         override fun onPlaybackStateChange(state: PlaybackStateCompat?) {
             state?.let {
                 mMediaSessionCompat!!.setPlaybackState(state)
@@ -115,7 +115,6 @@ class MusicService : MediaBrowserServiceCompat() {
                     PlaybackStateCompat.STATE_STOPPED -> moveServiceOutOfStartedState(state)
                 }
             }
-
         }
 
 
@@ -124,26 +123,31 @@ class MusicService : MediaBrowserServiceCompat() {
 
 
         private fun moveServiceToStartedState(state: PlaybackStateCompat) {
-            val notification = mMediaNotificationManager!!.getNotification(
-                    mMediaPlayerManager!!.currentMedia!!, state, sessionToken!!)
-            //
-            if (!mServiceInStartedState) {
-                ContextCompat.startForegroundService(
+                val notification = mMediaNotificationManager!!.getNotification(
+                    mMediaPlayerManager!!.currentMedia!!, state, sessionToken!!
+                )
+                //
+                if (!mServiceInStartedState) {
+                    ContextCompat.startForegroundService(
                         this@MusicService,
-                        Intent(this@MusicService, MusicService::class.java))
-                mServiceInStartedState = true
-            }
-            //
-            startForeground(NOTIFICATION_ID, notification)
+                        Intent(this@MusicService, MusicService::class.java)
+                    )
+                    mServiceInStartedState = true
+                }
+                //
+                startForeground(NOTIFICATION_ID, notification)
         }
 
         /**
          * @param state
          */
         private fun updateNotificationForPause(state: PlaybackStateCompat) {
-            NotificationManagerCompat.from(applicationContext).notify(NOTIFICATION_ID, mMediaNotificationManager!!.getNotification(
-                    mMediaPlayerManager!!.currentMedia!!, state, sessionToken!!))
-            stopForeground(false)
+                NotificationManagerCompat.from(applicationContext).notify(
+                    NOTIFICATION_ID, mMediaNotificationManager!!.getNotification(
+                        mMediaPlayerManager!!.currentMedia!!, state, sessionToken!!
+                    )
+                )
+                stopForeground(false)
         }
 
         /**

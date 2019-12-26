@@ -70,9 +70,18 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
                                 Timber.e(it)
                                 result.sendResult(null)
                             })
-
                 }
-            }).start(this)
+            })
+    }
+
+    override fun onResume() {
+        super.onResume()
+        MediaBrowserLoader.start(this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        MediaBrowserLoader.stop()
     }
 
     private fun createMediaItemAlbum(music: Music): MediaBrowserCompat.MediaItem {
@@ -97,7 +106,7 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
             run {
                 val item = mAdapter.getItem(position)
                 ArmsUtils.makeText(GsonKit.objectToJson(item!!)!!)
-                MediaBrowserLoader.getTransportControls().playFromMediaId(item.mediaId,null)
+                MediaBrowserLoader.getTransportControls()?.playFromMediaId(item.mediaId,null)
             }
         }
     }
@@ -118,12 +127,11 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
 
     override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
         Timber.w("onPlaybackStateChanged")
-        //音乐播放状态改变回调
         when (state?.state) {
-            PlaybackStateCompat.STATE_NONE -> "需要点击开始".showToast()
-            PlaybackStateCompat.STATE_PAUSED -> "需要点击重新开始".showToast()
-            PlaybackStateCompat.STATE_PLAYING -> "需要点击暂停".showToast()
-            else -> "需要点击开始".showToast()
+            PlaybackStateCompat.STATE_NONE -> floatingActionButton.setImageResource(R.drawable.ic_media_play)
+            PlaybackStateCompat.STATE_PAUSED -> floatingActionButton.setImageResource(R.drawable.ic_media_play)
+            PlaybackStateCompat.STATE_PLAYING -> floatingActionButton.setImageResource(R.drawable.ic_media_pause)
+            else ->floatingActionButton.setImageResource(R.drawable.ic_media_play)
         }
     }
 
@@ -141,25 +149,11 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
 
     /**
      * 加载成功的数据
+     * @param children 为来自Service的列表数据
      */
     override fun onChildrenLoaded(parentId: String, children: List<MediaBrowserCompat.MediaItem>) {
         Timber.i("onChildrenLoaded--- $parentId")
-        //children 为来自Service的列表数据
-        children.forEach{
-            Timber.i(it.description.title.toString())
-        }
-
         mAdapter.setNewData(children)
-        Timber.i("setNewData---")
-        if (MediaBrowserLoader.getMediaController() == null) {
-            return
-        }
-//            // Queue up all media items for this simple sample.
-        for (mediaItem in children) {
-            MediaBrowserLoader.getMediaController()?.addQueueItem(mediaItem.description)
-        }
-        // Call "playFromMedia" so the UI is updated.
-        MediaBrowserLoader.getMediaController()?.transportControls?.prepare()
     }
 
     override fun onDestroy() {

@@ -52,8 +52,7 @@ object MediaBrowserLoader{
      * 获取音乐控制器
      */
     @JvmStatic
-    fun getTransportControls(): MediaControllerCompat.TransportControls {
-        checkStart()
+    fun getTransportControls(): MediaControllerCompat.TransportControls? {
         return browserManager.transportControls
     }
 
@@ -62,7 +61,6 @@ object MediaBrowserLoader{
      */
     @JvmStatic
     fun getMediaController(): MediaControllerCompat? {
-        checkStart()
         return browserManager.getMediaController()
     }
 
@@ -79,10 +77,11 @@ object MediaBrowserLoader{
 
     /**
      * 设置播放模式
+     * 暂时不支持
      */
     @JvmStatic
-    fun setRepeatMode(@PlaybackStateCompat.RepeatMode repeatMode:Int){
-        getTransportControls().setRepeatMode(repeatMode)
+    private fun setRepeatMode(@PlaybackStateCompat.RepeatMode repeatMode:Int){
+        getTransportControls()?.setRepeatMode(repeatMode)
     }
 
     /**
@@ -149,12 +148,6 @@ object MediaBrowserLoader{
 
     private fun checkLoaderInit() {
         if (!isInit.get()) {
-            throw Exception("u should init first")
-        }
-    }
-
-    private fun checkStart() {
-        if (!isStart.get()) {
             throw Exception("u should init first")
         }
     }

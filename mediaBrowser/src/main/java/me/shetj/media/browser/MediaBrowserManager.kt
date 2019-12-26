@@ -66,12 +66,9 @@ internal class MediaBrowserManager private constructor() {
      *
      * @return
      */
-    val transportControls: MediaControllerCompat.TransportControls
+    val transportControls: MediaControllerCompat.TransportControls?
         get() {
-            if (mMediaController == null) {
-                throw IllegalStateException()
-            }
-            return mMediaController!!.transportControls
+            return mMediaController?.transportControls
         }
 
     fun getMediaController(): MediaControllerCompat ?{
@@ -253,11 +250,12 @@ internal class MediaBrowserManager private constructor() {
 
     /**
      * 添加音频变化回调
-     *
      * @param l
      */
     fun addOnMediaStatusListener(l: OnMediaStatusChangeListener) {
-        mMediaStatusChangeListenerList.add(l)
+        if (!mMediaStatusChangeListenerList.contains(l)) {
+            mMediaStatusChangeListenerList.add(l)
+        }
     }
 
     /**

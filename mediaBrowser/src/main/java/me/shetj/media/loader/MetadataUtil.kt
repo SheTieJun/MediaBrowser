@@ -56,10 +56,6 @@ object MetadataUtil {
         return if (musicFileName.containsKey(mediaId)) musicFileName[mediaId] else null
     }
 
-    private fun getAlbumRes(mediaId: String): String {
-        return if (albumRes.containsKey(mediaId)) albumRes[mediaId]!! else ""
-    }
-
     /**
      * 根据id 获取图片
      *
@@ -91,17 +87,17 @@ object MetadataUtil {
         val builder = MediaMetadataCompat.Builder()
         // 设置数据
         for (key in arrayOf(
-                MediaMetadataCompat.METADATA_KEY_MEDIA_ID,
-                MediaMetadataCompat.METADATA_KEY_ALBUM,
-                MediaMetadataCompat.METADATA_KEY_ARTIST,
-                MediaMetadataCompat.METADATA_KEY_GENRE,
-                MediaMetadataCompat.METADATA_KEY_TITLE)) {
+            MediaMetadataCompat.METADATA_KEY_MEDIA_ID,
+            MediaMetadataCompat.METADATA_KEY_ALBUM,
+            MediaMetadataCompat.METADATA_KEY_ARTIST,
+            MediaMetadataCompat.METADATA_KEY_GENRE,
+            MediaMetadataCompat.METADATA_KEY_TITLE)) {
             builder.putString(key, metadataWithoutBitmap!!.getString(key))
         }
         //
         builder.putLong(
-                MediaMetadataCompat.METADATA_KEY_DURATION,
-                metadataWithoutBitmap!!.getLong(MediaMetadataCompat.METADATA_KEY_DURATION))
+            MediaMetadataCompat.METADATA_KEY_DURATION,
+            metadataWithoutBitmap!!.getLong(MediaMetadataCompat.METADATA_KEY_DURATION))
         // 添加图片
         builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, albumArt)
         return builder.build()
@@ -120,20 +116,16 @@ object MetadataUtil {
         albumRes[mediaId] = album
         musicFileName[mediaId] = fileUrl
         val metadataCompat = MediaMetadataCompat.Builder()
-                .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, mediaId)
-                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, album)
-                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, artist)
-                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION,
-                        TimeUnit.MILLISECONDS.convert(duration, durationUnit))
-                .putString(MediaMetadataCompat.METADATA_KEY_GENRE, genre)
-                .putString(
-                        MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI,
-                        getAlbumArtUri(albumArtResName))
-                .putString(
-                        MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI,
-                        getAlbumArtUri(albumArtResName))
-                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, title)
-                .build()
+            .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, mediaId)
+            .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, album)
+            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, artist)
+            .putLong(MediaMetadataCompat.METADATA_KEY_DURATION,
+                TimeUnit.MILLISECONDS.convert(duration, durationUnit))
+            .putString(MediaMetadataCompat.METADATA_KEY_GENRE, genre)
+            .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, album)
+            .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI, album)
+            .putString(MediaMetadataCompat.METADATA_KEY_TITLE, title)
+            .build()
         music[mediaId] = metadataCompat
         return metadataCompat
     }

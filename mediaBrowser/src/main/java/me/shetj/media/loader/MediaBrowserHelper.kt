@@ -36,13 +36,6 @@ internal object MediaBrowserHelper{
         this.notificationHelper = notificationHelper
     }
 
-   internal fun onLoadChildren(parentMediaId: String, result: MediaBrowserServiceCompat.Result<List<MediaBrowserCompat.MediaItem>>) {
-        val callBack = mediaLoadDataCallBack[parentMediaId]
-        callBack?.let {
-            callBack.onLoadChildren(parentMediaId, result)
-        }
-    }
-
     fun addMediaLoadDataCallBack(parentMediaId:String, callBack: OnSubscribeCallBack) {
         mediaLoadDataCallBack[parentMediaId] = callBack
     }
@@ -53,10 +46,16 @@ internal object MediaBrowserHelper{
 
     /*********************************************** model 内使用的方法 ****************************************************************/
 
+    internal fun onLoadChildren(parentMediaId: String, result: MediaBrowserServiceCompat.Result<List<MediaBrowserCompat.MediaItem>>) {
+        val callBack = mediaLoadDataCallBack[parentMediaId]
+        callBack?.let {
+            callBack.onLoadChildren(parentMediaId, result)
+        }
+    }
+
     internal fun checkParentId(parentId: String): Boolean {
        return  null != mediaLoadDataCallBack[parentId]
     }
-
 
     internal fun getAlbumBitmap(mContext: Context, mediaId: String): Bitmap? {
         if (notificationHelper != null){
