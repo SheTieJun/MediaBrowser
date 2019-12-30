@@ -29,9 +29,10 @@ import me.shetj.media.loader.MetadataUtil
  * Exposes the functionality of the [MediaPlayer] and implements the [PlayerAdapter]
  */
 internal class MediaPlayerManager (context: Context,
-                          private val mPlaybackInfoListener: PlayInfoCallback
+                                   private val mPlaybackInfoListener: PlayInfoCallback
 )
     : PlayerAdapter(context) {
+    private var onCompletionListener: MediaPlayer.OnCompletionListener?=null
     // 上下文对象
     private val mContext: Context = context.applicationContext
     // 音频播放器MediaPlayer
@@ -45,9 +46,7 @@ internal class MediaPlayerManager (context: Context,
     private var mCurrentMediaPlayedToCompletion: Boolean = false
 
     // Work-around for a MediaPlayer bug related to the behavior of MediaPlayer.seekTo()
-    // while not playing.
     private var mSeekWhileNotPlaying = -1
-
 
     /**
      * 音频是否在播放
@@ -109,8 +108,6 @@ internal class MediaPlayerManager (context: Context,
 
 
     public override fun onStop() {
-        // Regardless of whether or not the MediaPlayer has been created / started, the state must
-        // be updated, so that MediaNotificationManager can take down the notification.
         setNewState(PlaybackStateCompat.STATE_STOPPED)
         release()
     }
@@ -129,9 +126,6 @@ internal class MediaPlayerManager (context: Context,
             }
             // seek to
             mMediaPlayer!!.seekTo(position.toInt())
-
-            // Set the state (to the current state) because the position changed and should
-            // be reported to clients.
             setNewState(mState)
         }
     }
@@ -154,14 +148,15 @@ internal class MediaPlayerManager (context: Context,
     /**
      * Once the [MediaPlayer] is released, it can't be used again, and another one has to be
      * object has to be created. That's why this method is private, and called by load(int) and
-     * not the constructor.
-     * 初始化mediaPlayer
      */
     private fun initializeMediaPlayer() {
         // 创建MediaPlayer
         if (mMediaPlayer == null) {
             mMediaPlayer = MediaPlayer()
-            // 音频播放完成的回调
+        }
+        mMediaPlayer!!.setOnCompletionListener{
+            onCompletionListener?.onCompletion(it)
+            setNewState(PlaybackStateCompat.STATE_PAUSED)
         }
     }
 
@@ -204,7 +199,6 @@ internal class MediaPlayerManager (context: Context,
         } catch (e: Exception) {
             throw RuntimeException("Failed to open file: " + mFilename!!, e)
         }
-
         // 播放
         play()
     }
@@ -212,7 +206,6 @@ internal class MediaPlayerManager (context: Context,
 
     /**
      * 播放状态
-     *
      * @param newPlayerState
      */
     // This is the main reducer for the player state machine.
@@ -239,9 +232,9 @@ internal class MediaPlayerManager (context: Context,
         val stateBuilder = PlaybackStateCompat.Builder()
         stateBuilder.setActions(availableActions)
         stateBuilder.setState(mState,
-                reportPosition,
-                1.0f,
-                SystemClock.elapsedRealtime())
+            reportPosition,
+            1.0f,
+            SystemClock.elapsedRealtime())
         // 播放状态回调
         mPlaybackInfoListener.onPlaybackStateChange(stateBuilder.build())
     }
@@ -258,13 +251,7 @@ internal class MediaPlayerManager (context: Context,
     }
 
     fun setOnCompletionListener(onCompletionListener: MediaPlayer.OnCompletionListener) {
-        if (mMediaPlayer == null){
-            initializeMediaPlayer()
-        }
-        mMediaPlayer!!.setOnCompletionListener{
-            onCompletionListener.onCompletion(it)
-            setNewState(PlaybackStateCompat.STATE_PAUSED)
-        }
+        this.onCompletionListener = onCompletionListener
     }
 
 }

@@ -79,8 +79,8 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
         MediaBrowserLoader.start(this)
     }
 
-    override fun onPause() {
-        super.onPause()
+    override fun onStop() {
+        super.onStop()
         MediaBrowserLoader.stop()
     }
 
@@ -159,6 +159,5 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
     override fun onDestroy() {
         super.onDestroy()
         MediaBrowserLoader.removeOnMediaStatusListener(this)
-        MediaBrowserLoader.stop()
     }
 }

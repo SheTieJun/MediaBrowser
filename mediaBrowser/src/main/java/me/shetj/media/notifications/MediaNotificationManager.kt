@@ -31,6 +31,9 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.media.session.MediaButtonReceiver
 import me.shetj.media.R
+import me.shetj.media.kt.isPlaying
+import me.shetj.media.kt.isSkipToNextEnabled
+import me.shetj.media.kt.isSkipToPreviousEnabled
 import me.shetj.media.loader.MediaBrowserHelper
 
 /**
@@ -67,18 +70,15 @@ internal class MediaNotificationManager(private val mContext: Context) {
                     PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS))
     private val stopPendingIntent =
         MediaButtonReceiver.buildMediaButtonPendingIntent(mContext, PlaybackStateCompat.ACTION_STOP)
-    init {
-        NotificationManagerCompat.from(mContext).cancelAll()
-    }
 
     fun onDestroy() {
-
+        NotificationManagerCompat.from(mContext).cancel(NOTIFICATION_ID)
     }
 
     fun getNotification(metadata: MediaMetadataCompat,
                         state: PlaybackStateCompat,
                         token: MediaSessionCompat.Token): Notification {
-        val isPlaying = state.state == PlaybackStateCompat.STATE_PLAYING
+        val isPlaying = state.isPlaying
         val description = metadata.description
         val builder = buildNotification(state, token, isPlaying, description)
         return builder.build()
@@ -95,14 +95,14 @@ internal class MediaNotificationManager(private val mContext: Context) {
 
         val builder = NotificationCompat.Builder(mContext, CHANNEL_ID)
         var position = 0
-        if (state.actions and PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS != 0L) {
+        if (state.isSkipToPreviousEnabled) {
             builder.addAction(mPrevAction)
             ++position
         }
 
         builder.addAction(if (isPlaying) mPauseAction else mPlayAction)
 
-        if (state.actions and PlaybackStateCompat.ACTION_SKIP_TO_NEXT != 0L) {
+        if (state.isSkipToNextEnabled) {
             builder.addAction(mNextAction)
         }
 

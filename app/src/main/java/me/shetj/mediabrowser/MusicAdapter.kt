@@ -42,7 +42,7 @@ class MusicAdapter(data: List<MediaBrowserCompat.MediaItem>?) : BaseQuickAdapter
      * 设置选中的位置
      */
     fun setSelectPosition(targetPos: Int) {
-        Timber.i("setSelectPosition=$position")
+        Timber.i("setSelectPosition=$targetPos")
         //如果不相等，说明有变化
         if (position != targetPos) {
             val old: Int = position

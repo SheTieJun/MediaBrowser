@@ -13,18 +13,18 @@ import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
-import androidx.annotation.NonNull
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationManagerCompat
 import androidx.media.MediaBrowserServiceCompat
 import me.shetj.media.MediaBrowserLoader
 import me.shetj.media.R
 import me.shetj.media.callback.NotificationHelper
-import me.shetj.media.notifications.MediaNotificationManager
 import me.shetj.media.callback.OnSubscribeCallBack
-import me.shetj.media.model.Music
-import java.util.concurrent.TimeUnit
+import me.shetj.media.notifications.MediaNotificationManager
 
+/**
+ * 帮助类，用设置自定义和默认情况
+ */
 internal object MediaBrowserHelper{
     /**
      * 通过不同的 parentMediaId ,使用不同的加载方式
@@ -82,20 +82,6 @@ internal object MediaBrowserHelper{
         }
     }
 
-    @NonNull
-    internal fun createMediaItemAlbum(@NonNull music: Music): MediaBrowserCompat.MediaItem {
-        val mediaMetadataCompat = MetadataUtil.getMediaMetadataCompat(
-            mediaId = music.name!!,
-            album = music.img!!,
-            duration = music.duration,
-            durationUnit = TimeUnit.MILLISECONDS,
-            genre = "1",
-            title = music.name!!
-            , fileUrl = music.url!!
-        )
-        return MediaBrowserCompat.MediaItem(mediaMetadataCompat.description, MediaBrowserCompat.MediaItem.FLAG_PLAYABLE)
-    }
-
     /*********************************************** 私有方法 ****************************************************************/
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -129,7 +115,5 @@ internal object MediaBrowserHelper{
         }
         return controller.sessionActivity
     }
-
-
 
 }

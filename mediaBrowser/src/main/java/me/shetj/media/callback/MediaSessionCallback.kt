@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Bundle
+import android.os.ResultReceiver
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
@@ -84,6 +85,13 @@ internal class MediaSessionCallback(private val context: Context,
             mMediaSessionCompat.isActive = true
         }
 
+    }
+
+    /**
+     * 是自定义操作
+     */
+    override fun onCommand(command: String?, extras: Bundle?, cb: ResultReceiver?) {
+        super.onCommand(command, extras, cb)
     }
 
 

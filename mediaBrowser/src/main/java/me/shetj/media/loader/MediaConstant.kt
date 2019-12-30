@@ -7,3 +7,5 @@ interface MediaConstant{
    }
 
 }
+
+const val NETWORK_FAILURE = "me.shetj.media.session.NETWORK_FAILURE"

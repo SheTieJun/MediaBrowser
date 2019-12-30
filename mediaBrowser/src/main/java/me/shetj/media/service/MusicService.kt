@@ -16,9 +16,14 @@
 
 package me.shetj.media.service
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
+import android.media.AudioManager
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
+import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.core.app.NotificationManagerCompat
@@ -39,7 +44,7 @@ import me.shetj.media.player.MediaPlayerManager
  * MediaBrowserServiceCompat
  */
 class MusicService : MediaBrowserServiceCompat() {
-
+    private lateinit var becomingNoisyReceiver: BecomingNoisyReceiver
     private var mMediaPlayerManager: MediaPlayerManager? = null
     private var mMediaNotificationManager: MediaNotificationManager? = null
     private var mServiceInStartedState: Boolean = false
@@ -55,6 +60,8 @@ class MusicService : MediaBrowserServiceCompat() {
         mMediaSessionCompat!!.setFlags(MediaSessionCompat.FLAG_HANDLES_QUEUE_COMMANDS)
         sessionToken = mMediaSessionCompat!!.sessionToken
         mMediaNotificationManager = MediaNotificationManager(this)
+        becomingNoisyReceiver =
+            BecomingNoisyReceiver(context = this, sessionToken = mMediaSessionCompat!!.sessionToken)
     }
 
     override fun onTaskRemoved(rootIntent: Intent) {
@@ -81,8 +88,8 @@ class MusicService : MediaBrowserServiceCompat() {
 
     //通过parentMediaId 加载不同的数据列表
     override fun onLoadChildren(
-            parentMediaId: String,
-            result: Result<List<MediaBrowserCompat.MediaItem>>) {
+        parentMediaId: String,
+        result: Result<List<MediaBrowserCompat.MediaItem>>) {
         //通过不同的parentId,获取不同的列表
         MediaBrowserHelper.onLoadChildren(parentMediaId,result)
     }
@@ -98,19 +105,49 @@ class MusicService : MediaBrowserServiceCompat() {
     ) {
 
     }
+    private class BecomingNoisyReceiver(
+        private val context: Context,
+        sessionToken: MediaSessionCompat.Token
+    ) : BroadcastReceiver() {
+
+        private val noisyIntentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
+        private val controller = MediaControllerCompat(context, sessionToken)
+
+        private var registered = false
+
+        fun register() {
+            if (!registered) {
+                context.registerReceiver(this, noisyIntentFilter)
+                registered = true
+            }
+        }
+
+        fun unregister() {
+            if (registered) {
+                context.unregisterReceiver(this)
+                registered = false
+            }
+        }
+
+        override fun onReceive(context: Context, intent: Intent) {
+            if (intent.action == AudioManager.ACTION_AUDIO_BECOMING_NOISY) {
+                controller.transportControls.pause()
+            }
+        }
+    }
 
 
 
     /**
      * MediaPlayer 播放状态回调
      */
-   internal inner class MediaPlayerListener : PlayInfoCallback() {
+    internal inner class MediaPlayerListener : PlayInfoCallback() {
 
         override fun onPlaybackStateChange(state: PlaybackStateCompat?) {
             state?.let {
                 mMediaSessionCompat!!.setPlaybackState(state)
                 when (state.state) {
-                    PlaybackStateCompat.STATE_PLAYING -> moveServiceToStartedState(state)
+                    PlaybackStateCompat.STATE_BUFFERING, PlaybackStateCompat.STATE_PLAYING -> moveServiceToStartedState(state)
                     PlaybackStateCompat.STATE_PAUSED -> updateNotificationForPause(state)
                     PlaybackStateCompat.STATE_STOPPED -> moveServiceOutOfStartedState(state)
                 }
@@ -123,31 +160,31 @@ class MusicService : MediaBrowserServiceCompat() {
 
 
         private fun moveServiceToStartedState(state: PlaybackStateCompat) {
-                val notification = mMediaNotificationManager!!.getNotification(
-                    mMediaPlayerManager!!.currentMedia!!, state, sessionToken!!
+            becomingNoisyReceiver.register()
+            val notification = mMediaNotificationManager!!.getNotification(
+                mMediaPlayerManager!!.currentMedia!!, state, sessionToken!!
+            )
+            if (!mServiceInStartedState) {
+                ContextCompat.startForegroundService(
+                    this@MusicService,
+                    Intent(this@MusicService, MusicService::class.java)
                 )
-                //
-                if (!mServiceInStartedState) {
-                    ContextCompat.startForegroundService(
-                        this@MusicService,
-                        Intent(this@MusicService, MusicService::class.java)
-                    )
-                    mServiceInStartedState = true
-                }
-                //
-                startForeground(NOTIFICATION_ID, notification)
+                mServiceInStartedState = true
+            }
+            startForeground(NOTIFICATION_ID, notification)
         }
 
         /**
          * @param state
          */
         private fun updateNotificationForPause(state: PlaybackStateCompat) {
-                NotificationManagerCompat.from(applicationContext).notify(
-                    NOTIFICATION_ID, mMediaNotificationManager!!.getNotification(
-                        mMediaPlayerManager!!.currentMedia!!, state, sessionToken!!
-                    )
+            becomingNoisyReceiver.unregister()
+            NotificationManagerCompat.from(applicationContext).notify(
+                NOTIFICATION_ID, mMediaNotificationManager!!.getNotification(
+                    mMediaPlayerManager!!.currentMedia!!, state, sessionToken!!
                 )
-                stopForeground(false)
+            )
+            stopForeground(false)
         }
 
         /**

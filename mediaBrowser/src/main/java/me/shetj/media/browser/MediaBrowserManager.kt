@@ -38,15 +38,14 @@ import java.util.*
 internal class MediaBrowserManager private constructor() {
 
     companion object {
-        @SuppressLint("StaticFieldLeak")
+        @Volatile
         private var browserManager :MediaBrowserManager ?=null
 
-        fun getInstance() :MediaBrowserManager {
-            if (browserManager == null){
-                browserManager = MediaBrowserManager()
+        fun getInstance( ) =
+            browserManager ?: synchronized(this) {
+                browserManager?: MediaBrowserManager()
+                    .also { browserManager = it }
             }
-            return browserManager!!
-        }
 
     }
 

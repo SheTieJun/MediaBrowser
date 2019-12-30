@@ -8,6 +8,7 @@ buildscript {
     ext.minVersion              = 21
     ext.versionCode             = 1
     ext.versionName             = "0.0.1"
+    ext.exoplayer_version       = '2.10.0'
 
     repositories {
         google()
