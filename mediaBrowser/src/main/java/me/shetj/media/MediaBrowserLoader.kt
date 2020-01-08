@@ -1,6 +1,5 @@
 package me.shetj.media
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.PlaybackStateCompat
@@ -14,7 +13,6 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 object MediaBrowserLoader{
 
-    @SuppressLint("StaticFieldLeak")
     private lateinit var browserManager: MediaBrowserManager
     private val isInit = AtomicBoolean(false)
     private val isStart = AtomicBoolean(false)
@@ -44,7 +42,7 @@ object MediaBrowserLoader{
     @JvmStatic
     fun start(context: Context){
         checkLoaderInit()
-        browserManager.onStart(context)
+        browserManager.onStart(context.applicationContext)
         isStart.compareAndSet(false,true)
     }
 
