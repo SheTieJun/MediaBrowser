@@ -21,6 +21,7 @@ import me.shetj.media.R
 import me.shetj.media.callback.NotificationHelper
 import me.shetj.media.callback.OnSubscribeCallBack
 import me.shetj.media.notifications.MediaNotificationManager
+import me.shetj.media.notifications.MediaNotificationManager.Companion.NOTIFICATION_ID
 
 /**
  * 帮助类，用设置自定义和默认情况
@@ -45,6 +46,14 @@ internal object MediaBrowserHelper{
     }
 
     /*********************************************** model 内使用的方法 ****************************************************************/
+
+    internal fun getNotificationID(): Int {
+        return  if (notificationHelper != null){
+            notificationHelper!!.getNotificationID()
+        }else{
+            NOTIFICATION_ID
+        }
+    }
 
     internal fun onLoadChildren(parentMediaId: String, result: MediaBrowserServiceCompat.Result<List<MediaBrowserCompat.MediaItem>>) {
         val callBack = mediaLoadDataCallBack[parentMediaId]
@@ -87,17 +96,25 @@ internal object MediaBrowserHelper{
     @RequiresApi(Build.VERSION_CODES.O)
     private fun defCreateChannel(mContext: Context){
         if (NotificationManagerCompat.from(mContext).getNotificationChannel(
-                MediaNotificationManager.CHANNEL_ID
+                getChannelID()
             ) == null) {
             val name = "MediaSession"
             val description = "MediaSession and MediaPlayer"
             val importance = NotificationManager.IMPORTANCE_LOW
-            val mChannel = NotificationChannel(MediaNotificationManager.CHANNEL_ID, name, importance)
+            val mChannel = NotificationChannel(getChannelID(), name, importance)
             mChannel.description = description
             mChannel.enableLights(true)
             mChannel.lightColor = Color.RED
             mChannel.enableVibration(true)
             NotificationManagerCompat.from(mContext).createNotificationChannel(mChannel)
+        }
+    }
+
+    private fun getChannelID(): String {
+        return  if (notificationHelper != null){
+            notificationHelper!!.getChannelID()?: MediaNotificationManager.CHANNEL_ID
+        }else{
+            MediaNotificationManager.CHANNEL_ID
         }
     }
 

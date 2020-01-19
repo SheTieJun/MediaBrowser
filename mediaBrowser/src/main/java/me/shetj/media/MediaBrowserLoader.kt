@@ -17,13 +17,6 @@ object MediaBrowserLoader{
     private val isInit = AtomicBoolean(false)
     private val isStart = AtomicBoolean(false)
 
-    @JvmStatic
-    fun initAndStart(context: Context) :MediaBrowserLoader{
-        init()
-        start(context)
-        return this
-    }
-
     /**
      * 初始化，必须执行的方法
      */
@@ -75,7 +68,8 @@ object MediaBrowserLoader{
 
     /**
      * 设置播放模式
-     * 暂时不支持
+     * 暂时 不支持
+     * TODO 替换到exoPlayer?
      */
     @JvmStatic
     private fun setRepeatMode(@PlaybackStateCompat.RepeatMode repeatMode:Int){

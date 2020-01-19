@@ -101,7 +101,7 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
     override fun initData() {
         mPresenter = MediaPresenter(this)
         mAdapter = MusicAdapter(ArrayList())
-        mAdapter.bindToRecyclerView(iRecyclerView)
+        iRecyclerView.adapter = mAdapter
         mAdapter.setOnItemClickListener { _, _, position ->
             run {
                 val item = mAdapter.getItem(position)

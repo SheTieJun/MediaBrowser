@@ -72,7 +72,7 @@ internal class MediaNotificationManager(private val mContext: Context) {
         MediaButtonReceiver.buildMediaButtonPendingIntent(mContext, PlaybackStateCompat.ACTION_STOP)
 
     fun onDestroy() {
-        NotificationManagerCompat.from(mContext).cancel(NOTIFICATION_ID)
+        NotificationManagerCompat.from(mContext).cancel(MediaBrowserHelper.getNotificationID())
     }
 
     fun getNotification(metadata: MediaMetadataCompat,

@@ -171,7 +171,7 @@ class MusicService : MediaBrowserServiceCompat() {
                 )
                 mServiceInStartedState = true
             }
-            startForeground(NOTIFICATION_ID, notification)
+            startForeground(MediaBrowserHelper.getNotificationID(), notification)
         }
 
         /**
@@ -180,7 +180,7 @@ class MusicService : MediaBrowserServiceCompat() {
         private fun updateNotificationForPause(state: PlaybackStateCompat) {
             becomingNoisyReceiver.unregister()
             NotificationManagerCompat.from(applicationContext).notify(
-                NOTIFICATION_ID, mMediaNotificationManager!!.getNotification(
+                MediaBrowserHelper.getNotificationID(), mMediaNotificationManager!!.getNotification(
                     mMediaPlayerManager!!.currentMedia!!, state, sessionToken!!
                 )
             )
