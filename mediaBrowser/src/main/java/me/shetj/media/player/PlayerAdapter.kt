@@ -44,8 +44,6 @@ abstract class PlayerAdapter(context: Context) {
 
 
     // ##########################################耳机状态变化的广播接收者###############################################
-
-
     /**
      * 耳机插拔等状态变化的监听
      */
@@ -63,9 +61,7 @@ abstract class PlayerAdapter(context: Context) {
         }
     }
 
-
     init {
-        // 上下文对象
         // 获取AudioManager
         mAudioManager = mContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         // OnAudioFocusChangeListener
@@ -92,7 +88,6 @@ abstract class PlayerAdapter(context: Context) {
      * Called when media is ready to be played and indicates the app has audio focus.
      */
     protected abstract fun onPlay()
-
 
     /**
      * 停止播放
@@ -134,14 +129,12 @@ abstract class PlayerAdapter(context: Context) {
 
     /**
      * seek to
-     *
      * @param position
      */
     abstract fun seekTo(position: Long)
 
     /**
      * 设置音频播放音量
-     *
      * @param volume
      */
     abstract fun setVolume(volume: Float)
@@ -149,17 +142,10 @@ abstract class PlayerAdapter(context: Context) {
 
     /**
      * Helper class for managing audio focus related tasks.
-     *
-     *
      * 音频焦点
      */
     private inner class AudioFocusHelper : AudioManager.OnAudioFocusChangeListener {
 
-        /**
-         * 请求音频焦点
-         *
-         * @return
-         */
         fun requestAudioFocus(): Boolean {
             // 请求音频焦点  并判断音频焦点的获取情况
             val result = mAudioManager.requestAudioFocus(this,
@@ -177,7 +163,6 @@ abstract class PlayerAdapter(context: Context) {
 
         /**
          * 音频焦点变化回调
-         *
          * @param focusChange
          */
         override fun onAudioFocusChange(focusChange: Int) {

@@ -5,10 +5,10 @@ import android.graphics.Color
 import android.support.v4.media.MediaBrowserCompat
 
 import com.chad.library.adapter.base.BaseQuickAdapter
-import com.chad.library.adapter.base.BaseViewHolder
+import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import timber.log.Timber
 
-class MusicAdapter(data: List<MediaBrowserCompat.MediaItem>?) : BaseQuickAdapter<MediaBrowserCompat.MediaItem, BaseViewHolder>(R.layout.item_select_music2, data) {
+class MusicAdapter(data: MutableList<MediaBrowserCompat.MediaItem>) : BaseQuickAdapter<MediaBrowserCompat.MediaItem, BaseViewHolder>(R.layout.item_select_music2, data) {
 
     private var position :Int = -1
 
@@ -31,11 +31,11 @@ class MusicAdapter(data: List<MediaBrowserCompat.MediaItem>?) : BaseQuickAdapter
     override fun convert(helper: BaseViewHolder, item: MediaBrowserCompat.MediaItem) {
         val itemPosition = helper.adapterPosition - headerLayoutCount
         helper.setText(R.id.tv_music_name, item.description.title)
-                .addOnClickListener(R.id.tv_play)
                 .setTextColor(R.id.tv_music_name,when(itemPosition == position){
                     true ->  Color.RED
                     false -> Color.BLACK
                 } )
+        addChildClickViewIds(R.id.tv_play)
     }
 
     /**

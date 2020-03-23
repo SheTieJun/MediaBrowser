@@ -39,10 +39,9 @@ internal class MediaBrowserManager private constructor() {
         @Volatile
         private var browserManager :MediaBrowserManager ?=null
 
-        fun getInstance( ) =
+        fun getInstance() =
             browserManager ?: synchronized(this) {
-                browserManager?: MediaBrowserManager()
-                    .also { browserManager = it }
+                MediaBrowserManager().also { browserManager = it }
             }
 
     }
@@ -115,7 +114,7 @@ internal class MediaBrowserManager private constructor() {
         mMediaBrowserCompat?.subscribe(parentId,mMediaBrowserSubscriptionCallback)
     }
 
-    // ############################################onConnected CallBack################################################
+    /* ############################################onConnected CallBack################################################ */
 
     /**
      * mediaService的链接回调
@@ -164,7 +163,6 @@ internal class MediaBrowserManager private constructor() {
 
         /**
          * service 的数据发送到这里
-         *
          * @param parentId
          * @param children
          */
@@ -181,10 +179,10 @@ internal class MediaBrowserManager private constructor() {
 
             // Queue up all media items for this simple sample.
             for (mediaItem in children) {
-                mMediaController!!.addQueueItem(mediaItem.description)
+                mMediaController?.addQueueItem(mediaItem.description)
             }
             // Call "playFromMedia" so the UI is updated.
-            mMediaController!!.transportControls.prepare()
+            transportControls?.prepare()
         }
     }
 
@@ -262,8 +260,6 @@ internal class MediaBrowserManager private constructor() {
     fun removeOnMediaStatusListener(l: OnMediaStatusChangeListener) {
         mMediaStatusChangeListenerList.remove(l)
     }
-
-
 
 
 }

@@ -30,7 +30,8 @@ object MediaBrowserLoader{
     }
 
     /**
-     * 开始服务
+     * 1、如果音乐服务没有开启，就开始服务
+     * 2、连接服务
      */
     @JvmStatic
     fun start(context: Context){
@@ -44,6 +45,7 @@ object MediaBrowserLoader{
      */
     @JvmStatic
     fun getTransportControls(): MediaControllerCompat.TransportControls? {
+        checkLoaderInit()
         return browserManager.transportControls
     }
 
@@ -52,11 +54,13 @@ object MediaBrowserLoader{
      */
     @JvmStatic
     fun getMediaController(): MediaControllerCompat? {
+        checkLoaderInit()
         return browserManager.getMediaController()
     }
 
     /**
-     * 关闭音乐播放服务
+     * 停止更新界面，但是没有关闭服务
+     * 当下一次链接服务
      */
     @JvmStatic
     fun stop(){

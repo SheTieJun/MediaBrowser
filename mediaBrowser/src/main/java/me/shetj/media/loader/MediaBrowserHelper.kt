@@ -63,7 +63,7 @@ internal object MediaBrowserHelper{
     }
 
     internal fun checkParentId(parentId: String): Boolean {
-       return  null != mediaLoadDataCallBack[parentId]
+       return mediaLoadDataCallBack.containsKey(parentId)
     }
 
     internal fun getAlbumBitmap(mContext: Context, mediaId: String): Bitmap? {

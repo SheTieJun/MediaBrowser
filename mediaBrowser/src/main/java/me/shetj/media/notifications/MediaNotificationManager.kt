@@ -44,30 +44,31 @@ internal class MediaNotificationManager(private val mContext: Context) {
 
 
     private val mPlayAction: NotificationCompat.Action = NotificationCompat.Action(
-            R.drawable.ic_play_arrow_white_24dp,
-            mContext.getString(R.string.label_play),
-            MediaButtonReceiver.buildMediaButtonPendingIntent(mContext, PlaybackStateCompat.ACTION_PLAY))
+        R.drawable.ic_play_arrow_white_24dp,
+        mContext.getString(R.string.label_play),
+        MediaButtonReceiver.buildMediaButtonPendingIntent(mContext, PlaybackStateCompat.ACTION_PLAY))
 
     private val mPauseAction: NotificationCompat.Action = NotificationCompat.Action(
-            R.drawable.ic_pause_white_24dp,
-            mContext.getString(R.string.label_pause),
-            MediaButtonReceiver.buildMediaButtonPendingIntent(
-                    mContext,
-                    PlaybackStateCompat.ACTION_PAUSE))
+        R.drawable.ic_pause_white_24dp,
+        mContext.getString(R.string.label_pause),
+        MediaButtonReceiver.buildMediaButtonPendingIntent(
+            mContext,
+            PlaybackStateCompat.ACTION_PAUSE))
 
     private val mNextAction: NotificationCompat.Action = NotificationCompat.Action(
-            R.drawable.ic_skip_next_white_24dp,
-            mContext.getString(R.string.label_next),
-            MediaButtonReceiver.buildMediaButtonPendingIntent(
-                    mContext,
-                    PlaybackStateCompat.ACTION_SKIP_TO_NEXT))
+        R.drawable.ic_skip_next_white_24dp,
+        mContext.getString(R.string.label_next),
+        MediaButtonReceiver.buildMediaButtonPendingIntent(
+            mContext,
+            PlaybackStateCompat.ACTION_SKIP_TO_NEXT))
 
     private val mPrevAction: NotificationCompat.Action = NotificationCompat.Action(
-            R.drawable.ic_skip_previous_white_24dp,
-            mContext.getString(R.string.label_previous),
-            MediaButtonReceiver.buildMediaButtonPendingIntent(
-                    mContext,
-                    PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS))
+        R.drawable.ic_skip_previous_white_24dp,
+        mContext.getString(R.string.label_previous),
+        MediaButtonReceiver.buildMediaButtonPendingIntent(
+            mContext,
+            PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS))
+
     private val stopPendingIntent =
         MediaButtonReceiver.buildMediaButtonPendingIntent(mContext, PlaybackStateCompat.ACTION_STOP)
 
@@ -107,24 +108,21 @@ internal class MediaNotificationManager(private val mContext: Context) {
         }
 
         val mediaStyle = androidx.media.app.NotificationCompat.MediaStyle()
-                .setMediaSession(token)
+            .setMediaSession(token)
             .setShowActionsInCompactView(position)
-                .setShowCancelButton(true)
-                .setCancelButtonIntent(
-                        MediaButtonReceiver.buildMediaButtonPendingIntent(
-                                mContext,
-                                PlaybackStateCompat.ACTION_STOP))
+            .setShowCancelButton(true)
+            .setCancelButtonIntent(stopPendingIntent)
+
         builder.setStyle(mediaStyle)
+            .setSmallIcon(R.drawable.ic_stat_image_audiotrack)
+            .setLargeIcon(MediaBrowserHelper.getAlbumBitmap(mContext, description.mediaId!!))
+            .setContentIntent(createContentIntent(token))
+            .setDeleteIntent(stopPendingIntent)
+            .setContentTitle(description.title)
+            .setContentText(description.subtitle)
             .setColor(ContextCompat.getColor(mContext, R.color.notification_bg))
-                .setSmallIcon(R.drawable.ic_stat_image_audiotrack)
-                .setContentIntent(createContentIntent(token))
-                .setDeleteIntent(stopPendingIntent)
-                .setContentTitle(description.title)
-                .setContentText(description.subtitle)
-                .setLargeIcon(MediaBrowserHelper.getAlbumBitmap(mContext, description.mediaId!!))
-                .setDeleteIntent(MediaButtonReceiver.buildMediaButtonPendingIntent(
-                        mContext, PlaybackStateCompat.ACTION_STOP))
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+
         return builder
     }
 

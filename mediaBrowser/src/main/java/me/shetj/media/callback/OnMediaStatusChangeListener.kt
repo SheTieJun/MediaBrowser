@@ -9,6 +9,10 @@ import android.support.v4.media.session.PlaybackStateCompat
  * 音频变化回调
  */
 interface OnMediaStatusChangeListener {
+
+    /**
+     * 连接服务成功
+     */
     fun connectionCallback(isSuccess: Boolean)
     /**
      * 播放状态修改

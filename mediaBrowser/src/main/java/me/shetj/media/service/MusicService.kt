@@ -30,13 +30,11 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.media.MediaBrowserServiceCompat
 import androidx.media.session.MediaButtonReceiver
-import me.shetj.media.notifications.MediaNotificationManager
-import me.shetj.media.notifications.MediaNotificationManager.Companion.NOTIFICATION_ID
 import me.shetj.media.callback.MediaSessionCallback
 import me.shetj.media.callback.PlayInfoCallback
-import me.shetj.media.MediaBrowserLoader
 import me.shetj.media.loader.MediaBrowserHelper
 import me.shetj.media.loader.MetadataUtil
+import me.shetj.media.notifications.MediaNotificationManager
 import me.shetj.media.player.MediaPlayerManager
 
 
@@ -156,6 +154,7 @@ class MusicService : MediaBrowserServiceCompat() {
 
 
         override fun onPlaybackCompleted() {
+
         }
 
 
