@@ -45,5 +45,6 @@ dependencies {
     implementation "com.google.android.exoplayer:exoplayer-ui:$exoplayer_version"
     implementation "com.google.android.exoplayer:extension-mediasession:$exoplayer_version"
 
-
+    //因为需要添加网络请求音乐列表测试
+    implementation 'com.zhouyou:rxeasyhttp:2.1.5'
 }

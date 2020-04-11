@@ -90,6 +90,12 @@ object MediaBrowserLoader{
         browserManager.subscribe(parentId)
     }
 
+    @JvmStatic
+    fun unSubscribe(parentId:String) {
+        checkLoaderInit()
+        browserManager.unSubscribe(parentId)
+    }
+
     /**
      * 添加 [parentMediaId] 的加载数据的方式
      * 只会存在唯一的一个

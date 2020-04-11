@@ -27,7 +27,7 @@ dependencies {
 
 #### [如何使用](./app/src/main/java/me/shetj/mediabrowser/MainActivity.kt) 
 初始化
-```
+```  // onLoadChildren 这个方法会在     MediaBrowserLoader.subscribe(parentId) 之后回调
       MediaBrowserLoader.init() //必须执行
                 .addOnMediaStatusListener(this)
                 .addMediaLoadDataCallBack("local_music",object :OnSubscribeCallBack{

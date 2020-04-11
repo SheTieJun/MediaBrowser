@@ -10,6 +10,7 @@ import androidx.media.MediaBrowserServiceCompat
 import kotlinx.android.synthetic.main.activity_main.*
 import me.shetj.base.base.BaseActivity
 import me.shetj.base.kt.getRxPermissions
+import me.shetj.base.kt.showToast
 import me.shetj.base.tools.app.ArmsUtils
 import me.shetj.base.tools.json.GsonKit
 import me.shetj.media.MediaBrowserLoader
@@ -23,8 +24,8 @@ import java.util.concurrent.TimeUnit
 class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener {
 
     private lateinit var mAdapter: MusicAdapter
-    private val parentId  = "Local_music"
-
+    private val parentId = "Local_music"
+    private val parentId2 = "netMusic"
     private val rxPermission = getRxPermissions()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,25 +35,47 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
         floatingActionButton.setOnClickListener {
             MediaBrowserLoader.startOrPause()
         }
+        //点击切换
+        btn_changeMusic.setOnClickListener {
+            changeSubscribeMusic()
+        }
+    }
+
+    private fun changeSubscribeMusic() {
+        if (btn_changeMusic.text != parentId) {
+            subscribeLocalMusic()
+        } else {
+            subscribeNetWorkMusic()
+        }
     }
 
 
     override fun initView() {
+        //addMediaLoadDataCallBack 这个方法会在     MediaBrowserLoader.subscribe(parentId2) 之后回调
         MediaBrowserLoader.addOnMediaStatusListener(this)
-            .addMediaLoadDataCallBack(parentId,object :OnSubscribeCallBack{
-                override fun onLoadChildren(parentMediaId: String,
-                                            result: MediaBrowserServiceCompat.Result<List<MediaBrowserCompat.MediaItem>>) {
+            .addMediaLoadDataCallBack(parentId, object : OnSubscribeCallBack {
+                override fun onLoadChildren(
+                    parentMediaId: String,
+                    result: MediaBrowserServiceCompat.Result<List<MediaBrowserCompat.MediaItem>>
+                ) {
+                    mAdapter.setNewData(null)
                     mPresenter?.apply {
                         addDispose(MusicUtils.loadFileData(rxContext).map {
                             //本地音频
                             val mediaItems = ArrayList<MediaBrowserCompat.MediaItem>()
+                            //网络音频测试
+                            mediaItems.add(
+                                createTestUrlMedia(
+                                    "https://media.lycheer.net/lecture/6583/5dba9468334c6837aee49262_transcoded.m4a",
+                                    "网路：温暖春天的爱情",
+                                    100
+                                )
+                            )
                             it.apply {
                                 forEach { it1 ->
                                     mediaItems.add(createMediaItemAlbum(it1))
                                 }
                             }
-                            //网络音频测试
-                            mediaItems.add(createTestUrlMedia())
                             mediaItems
                         }.subscribe({
                             result.sendResult(it)
@@ -63,6 +86,26 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
                     }
                 }
             })
+        MediaBrowserLoader.addMediaLoadDataCallBack(parentId2, object : OnSubscribeCallBack {
+            override fun onLoadChildren(
+                parentMediaId: String,
+                result: MediaBrowserServiceCompat.Result<List<MediaBrowserCompat.MediaItem>>
+            ) {
+                mAdapter.setNewData(null)
+                //如果在这里进行网络请求必须，要求网络时同步请求
+                mPresenter?.loadNetMusic {
+                    if (it == null) {
+                        result.sendResult(null)
+                    } else {
+                        it.map {
+                            createMediaItemAlbum(it)
+                        }.apply {
+                            result.sendResult(this)
+                        }
+                    }
+                }
+            }
+        })
     }
 
     override fun initData() {
@@ -73,7 +116,7 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
             run {
                 val item = mAdapter.getItem(position)
                 ArmsUtils.makeText(GsonKit.objectToJson(item!!)!!)
-                MediaBrowserLoader.getTransportControls()?.playFromMediaId(item.mediaId,null)
+                MediaBrowserLoader.getTransportControls()?.playFromMediaId(item.mediaId, null)
             }
         }
     }
@@ -100,24 +143,50 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
             title = music.name!!
             , fileUrl = music.url!!
         )
-        return MediaBrowserCompat.MediaItem(mediaMetadataCompat.description, MediaBrowserCompat.MediaItem.FLAG_PLAYABLE)
+        return MediaBrowserCompat.MediaItem(
+            mediaMetadataCompat.description,
+            MediaBrowserCompat.MediaItem.FLAG_PLAYABLE
+        )
     }
 
-    private fun createTestUrlMedia(): MediaBrowserCompat.MediaItem {
+    private fun createMediaItemAlbum(music: NetMusic): MediaBrowserCompat.MediaItem {
         val mediaMetadataCompat = MetadataUtil.getMediaMetadataCompat(
-            mediaId = "测试音乐",
-            album = "",
-            duration = 100,
+            mediaId = music.url!!,
+            album = music.imgUrl!!,
+            duration = music.duration?.toLong() ?: 100,
             durationUnit = TimeUnit.MILLISECONDS,
             genre = "1",
-            title = "测试音乐",
-            fileUrl = "https://xxxxxx.m4a"
+            title = music.title!!
+            , fileUrl = music.url!!
         )
-        return MediaBrowserCompat.MediaItem(mediaMetadataCompat.description, MediaBrowserCompat.MediaItem.FLAG_PLAYABLE)
+        return MediaBrowserCompat.MediaItem(
+            mediaMetadataCompat.description,
+            MediaBrowserCompat.MediaItem.FLAG_PLAYABLE
+        )
     }
-    //endregion
 
+    private fun createTestUrlMedia(
+        url: String,
+        name: String,
+        duration: Long
+    ): MediaBrowserCompat.MediaItem {
+        val mediaMetadataCompat = MetadataUtil.getMediaMetadataCompat(
+            mediaId = url,
+            album = "",
+            duration = duration,
+            durationUnit = TimeUnit.MILLISECONDS,
+            genre = "1",
+            title = name,
+            fileUrl = url
+        )
+        return MediaBrowserCompat.MediaItem(
+            mediaMetadataCompat.description,
+            MediaBrowserCompat.MediaItem.FLAG_PLAYABLE
+        )
+    }
+    //endregion 创建MediaItem
 
+    //region 开始订阅
     private fun subscribeLocalMusic() {
         mPresenter?.addDispose(rxPermission
             .request(
@@ -126,15 +195,35 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
             )
             .subscribe {
                 if (it) {
+                    btn_changeMusic.text = parentId
+                    MediaBrowserLoader.unSubscribe(parentId2)
                     MediaBrowserLoader.subscribe(parentId)
                 }
             })
     }
 
+    private fun subscribeNetWorkMusic() {
+        btn_changeMusic.text = parentId2
+        MediaBrowserLoader.unSubscribe(parentId)
+        MediaBrowserLoader.subscribe(parentId2)
+
+        //建议时先获取网络列表，在进行订阅
+        //   mPresenter?.loadNetMusic {
+        //     成功后，先保存数据，然后切换
+        //              btn_changeMusic.text = parentId2
+        //        MediaBrowserLoader.unSubscribe(parentId)
+        //        MediaBrowserLoader.subscribe(parentId2)
+        //  }
+    }
+    //endregion
+
+
+    //region 回调部分
     override fun connectionCallback(isSuccess: Boolean) {
         Timber.w("connectionCallback:$isSuccess")
-        if (isSuccess){
-            subscribeLocalMusic()
+        if (isSuccess) {
+            //连接成功，默认初始化网络数据
+            subscribeNetWorkMusic()
         }
     }
 
@@ -144,7 +233,7 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
             PlaybackStateCompat.STATE_NONE -> floatingActionButton.setImageResource(R.drawable.ic_media_play)
             PlaybackStateCompat.STATE_PAUSED -> floatingActionButton.setImageResource(R.drawable.ic_media_play)
             PlaybackStateCompat.STATE_PLAYING -> floatingActionButton.setImageResource(R.drawable.ic_media_pause)
-            else ->floatingActionButton.setImageResource(R.drawable.ic_media_play)
+            else -> floatingActionButton.setImageResource(R.drawable.ic_media_play)
         }
     }
 
@@ -167,7 +256,9 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
     override fun onChildrenLoaded(parentId: String, children: List<MediaBrowserCompat.MediaItem>) {
         Timber.i("onChildrenLoaded--- $parentId")
         mAdapter.setNewData(children.toMutableList())
+        "当前是：$parentId".showToast()
     }
+    //endregion
 
     override fun onDestroy() {
         super.onDestroy()

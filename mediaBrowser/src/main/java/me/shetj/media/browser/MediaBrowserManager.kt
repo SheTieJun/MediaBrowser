@@ -114,6 +114,10 @@ internal class MediaBrowserManager private constructor() {
         mMediaBrowserCompat?.subscribe(parentId,mMediaBrowserSubscriptionCallback)
     }
 
+    fun unSubscribe(parentId:String){
+        mMediaBrowserCompat?.unsubscribe(parentId)
+    }
+
     /* ############################################onConnected CallBack################################################ */
 
     /**

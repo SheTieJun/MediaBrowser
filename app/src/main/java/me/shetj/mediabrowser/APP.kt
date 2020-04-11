@@ -19,6 +19,7 @@ class APP : Application()   {
     override fun onCreate() {
         super.onCreate()
         s.init(this,BuildConfig.DEBUG )
+        EasyHttpUtils.init(this,BuildConfig.DEBUG,"https://baidu.com",1)
     }
 
     override fun attachBaseContext(base: Context?) {
