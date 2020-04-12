@@ -115,4 +115,29 @@ object MusicUtils{
 //        }
 //
 //    }
+
+    fun formatTime(ms: Long): String {
+        val ss = 1000
+        val mi = ss * 60
+        val hh = mi * 60
+        val dd = hh * 24
+        //
+        val day = ms / dd
+        val hour = (ms - day * dd) / hh
+        val minute = (ms - day * dd - hour * hh) / mi
+        val second = (ms - day * dd - hour * hh - minute * mi) / ss
+        val milliSecond = ms - day * dd - hour * hh - minute * mi - second * ss
+        //
+        val strDay = if (day < 10) "0$day" else "" + day
+        //        //天
+        val strHour = if (hour < 10) "0$hour" else "" + hour
+        //        //小时
+        val strMinute = if (minute < 10) "0$minute" else "" + minute
+        //        //分钟
+        val strSecond = if (second < 10) "0$second" else "" + second
+        //        //秒
+        var strMilliSecond = if (milliSecond < 10) "0$milliSecond" else "" + milliSecond
+        //
+        return "$strMinute：$strSecond"
+    }
 }

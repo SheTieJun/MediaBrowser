@@ -86,15 +86,25 @@ dependencies {
 
 [具体方法](./mediaBrowser/src/main/java/me/shetj/media/MediaBrowserLoader.kt)
 
-获取时间
+获取当前时间，如果是播放中可以没300ms循环调用一次
+
 ```
-long currentPosition = ((SystemClock.elapsedRealtime() – playbackState.getLastPositionUpdateTime() ) * playbackState. getPlaybackSpeed() ) + playbackState.getPosition();
+playbackStateCompat?.currentPlayBackPosition
+```
+
+获取总时长
+```
+   override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
+        metadata?.let {
+            Timber.i("onMetadataChanged: 获取总时长  duration = ${ metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION)}")
+        }
+    }
 ```
 
 ### 基础流程（因为可能有人对google的这框架不了解的，所以简单介绍其中主要的流程）
 
 1. 初始化 `MediaBrowserLoader.init() `
-2. 订阅流程：`MediaBrowserLoader.subscribe(parentId)` -> `onLoadChildren()` -> `result.sendResult(it)`-> ·onChildrenLoaded()`
+2. 订阅流程：`MediaBrowserLoader.subscribe(parentId)` -> `onLoadChildren()` -> `result.sendResult(it)`-> `onChildrenLoaded()`
 3. 取消订阅：`MediaBrowserLoader.unSubscribe(parentId)`
 4. 如果切换订阅，必须先取消上一个的订阅，再订阅新的
 
