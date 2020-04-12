@@ -81,26 +81,23 @@ dependencies {
 ```
 控制播放
 ```
-    private fun startOrPause() {
-        when(MediaBrowserLoader.getMediaController()?.playbackState?.state){
-            PlaybackStateCompat.STATE_PLAYING ->{
-                MediaBrowserLoader.getMediaController()?.transportControls?.pause()
-            }
-            PlaybackStateCompat.STATE_PAUSED ->{
-                MediaBrowserLoader.getMediaController()?.transportControls?.play()
-            }
-            else ->{
-                MediaBrowserLoader.getMediaController()?.transportControls?.play()
-            }
-        }
-    }
+    MediaBrowserLoader.startOrPause()
 ```
 
 [具体方法](./mediaBrowser/src/main/java/me/shetj/media/MediaBrowserLoader.kt)
+
 获取时间
 ```
 long currentPosition = ((SystemClock.elapsedRealtime() – playbackState.getLastPositionUpdateTime() ) * playbackState. getPlaybackSpeed() ) + playbackState.getPosition();
 ```
+
+### 基础流程（因为可能有人对google的这框架不了解的，所以简单介绍其中主要的流程）
+
+1. 初始化 `MediaBrowserLoader.init() `
+2. 订阅流程：`MediaBrowserLoader.subscribe(parentId)` -> `onLoadChildren()` -> `result.sendResult(it)`-> ·onChildrenLoaded()`
+3. 取消订阅：`MediaBrowserLoader.unSubscribe(parentId)`
+4. 如果切换订阅，必须先取消上一个的订阅，再订阅新的
+
 ### 注意点
 如果使用本地文件，并且targetSdkVersion >= 29
 请在AndroidManifest.xml

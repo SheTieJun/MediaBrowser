@@ -51,7 +51,7 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
 
 
     override fun initView() {
-        //addMediaLoadDataCallBack 这个方法会在     MediaBrowserLoader.subscribe(parentId2) 之后回调
+        // onLoadChildren 这个方法会在     MediaBrowserLoader.subscribe(parentId) 之后回调
         MediaBrowserLoader.addOnMediaStatusListener(this)
             .addMediaLoadDataCallBack(parentId, object : OnSubscribeCallBack {
                 override fun onLoadChildren(
@@ -115,7 +115,7 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
         mAdapter.setOnItemClickListener { _, _, position ->
             run {
                 val item = mAdapter.getItem(position)
-                ArmsUtils.makeText(GsonKit.objectToJson(item!!)!!)
+                ArmsUtils.makeText(GsonKit.objectToJson(item)!!)
                 MediaBrowserLoader.getTransportControls()?.playFromMediaId(item.mediaId, null)
             }
         }
