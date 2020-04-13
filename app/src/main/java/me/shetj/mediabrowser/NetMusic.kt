@@ -13,7 +13,7 @@ class NetMusic {
     /**
      * url : https://media.lycheer.net/lecture/6583/5dba9468334c6837aee49262_transcoded.m4a
      * title : 温暖春天的爱情 / 温馨
-     * duration : 03:34
+     * duration : 180
      * imgUrl : https://img.lycheer.net/material/6583/5d70da288069bd42ddc9a961.png
      */
     var url: String? = null

@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit
 
 class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener {
 
-    private var subscribe: Disposable? =null
+    private var subscribe: Disposable? = null
     private lateinit var mAdapter: MusicAdapter
     private val parentId = "Local_music"
     private val parentId2 = "netMusic"
@@ -46,8 +46,8 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
         btn_changeMusic.setOnClickListener {
             changeSubscribeMusic()
         }
-
     }
+
 
     private fun changeSubscribeMusic() {
         if (btn_changeMusic.text != parentId) {
@@ -70,21 +70,19 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
                     mPresenter?.apply {
                         addDispose(MusicUtils.loadFileData(rxContext).map {
                             //本地音频
-                            val mediaItems = ArrayList<MediaBrowserCompat.MediaItem>()
-                            //网络音频测试
-                            mediaItems.add(
-                                createTestUrlMedia(
-                                    "https://media.lycheer.net/lecture/6583/5dba9468334c6837aee49262_transcoded.m4a",
-                                    "网路：温暖春天的爱情",
-                                    100
+                            ArrayList<MediaBrowserCompat.MediaItem>().apply {
+                                //网络音频测试
+                                add(
+                                    createTestUrlMedia(
+                                        "https://media.lycheer.net/lecture/6583/5dba9468334c6837aee49262_transcoded.m4a",
+                                        "网路：温暖春天的爱情",
+                                        100 * 1000
+                                    )
                                 )
-                            )
-                            it.apply {
-                                forEach { it1 ->
-                                    mediaItems.add(createMediaItemAlbum(it1))
-                                }
+                                addAll(it.map {
+                                    createMediaItemAlbum(it)
+                                })
                             }
-                            mediaItems
                         }.subscribe({
                             result.sendResult(it)
                         }, {
@@ -105,8 +103,8 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
                     if (it == null) {
                         result.sendResult(null)
                     } else {
-                        it.map {
-                            createMediaItemAlbum(it)
+                        it.map { music ->
+                            createMediaItemAlbum(music)
                         }.apply {
                             result.sendResult(this)
                         }
@@ -123,7 +121,7 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
         mAdapter.setOnItemClickListener { _, _, position ->
             run {
                 val item = mAdapter.getItem(position)
-                ArmsUtils.makeText(item.toJson()?:"数据异常")
+                ArmsUtils.makeText(item.toJson() ?: "数据异常")
                 MediaBrowserLoader.getTransportControls()?.playFromMediaId(item.mediaId, null)
             }
         }
@@ -251,7 +249,7 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
         Timber.w("onMetadataChanged")
         metadata?.let {
 
-            Timber.i("onMetadataChanged: 获取总时长  duration = ${ metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION)}")
+            Timber.i("onMetadataChanged: 获取总时长  duration = ${metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION)}")
             mAdapter.selectMediaId(it.description.mediaId)
         }
     }
@@ -274,17 +272,22 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
 
     private fun setTimeConfig(state: PlaybackStateCompat?) {
         if (state?.state == PlaybackStateCompat.STATE_PLAYING) {
-            //没300 毫秒更新一次
+            disSubscribe()
+            //每300 毫秒更新一次
             subscribe = Flowable.interval(300, TimeUnit.MILLISECONDS)
                 .compose(RxLifecycle.bindUntilEvent(lifecycle(), ActivityEvent.DESTROY))
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext {
                     time.text = getCurrentTime(state)
                 }.subscribe()
-        }else{
-            if (subscribe !=null && !subscribe!!.isDisposed ){
-                subscribe?.dispose()
-            }
+        } else {
+            disSubscribe()
+        }
+    }
+
+    private fun disSubscribe() {
+        if (subscribe != null && !subscribe!!.isDisposed) {
+            subscribe?.dispose()
         }
     }
 

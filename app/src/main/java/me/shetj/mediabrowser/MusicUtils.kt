@@ -14,24 +14,29 @@ import java.util.*
  * <b>@email：</b> 375105540@qq.com<br>
  * <b>@describe</b>  <br>
  */
-object MusicUtils{
+object MusicUtils {
     /**
      * 查询本地的音乐文件
      */
-      fun loadFileData(context:Context): Flowable<List<Music>> {
-       return Flowable.create({ emitter ->
+    fun loadFileData(context: Context): Flowable<List<Music>> {
+        return Flowable.create({ emitter ->
             val resolver = context.contentResolver
-            val cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                    null, null, null, null)
+            val cursor = resolver.query(
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                null, null, null, null
+            )
             cursor!!.moveToFirst()
-           val musicList = ArrayList<Music>()
+            val musicList = ArrayList<Music>()
             if (cursor.moveToFirst()) {
                 do {
-                    val title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE))
+                    val title =
+                        cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE))
                     val size = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE))
                     val url = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA))
-                    val duration = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION))
-                    val album = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM))
+                    val duration =
+                        cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION))
+                    val album =
+                        cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM))
                     if (duration in 1000..2000000) {
                         val music = Music()
                         music.name = title
@@ -51,7 +56,6 @@ object MusicUtils{
             }
         }, BackpressureStrategy.BUFFER)
     }
-
 
 
 //    fun  getMusci(context: Context){

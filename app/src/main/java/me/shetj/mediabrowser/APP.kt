@@ -14,12 +14,12 @@ import me.shetj.base.s
  * <b>@email：</b> 375105540@qq.com<br>
  * <b>@describe</b><br>
  */
-class APP : Application()   {
+class APP : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        s.init(this,BuildConfig.DEBUG )
-        EasyHttpUtils.init(this,BuildConfig.DEBUG,"https://baidu.com",1)
+        s.init(this, BuildConfig.DEBUG)
+        EasyHttpUtils.init(this, BuildConfig.DEBUG, "https://baidu.com", 1)
     }
 
     override fun attachBaseContext(base: Context?) {
