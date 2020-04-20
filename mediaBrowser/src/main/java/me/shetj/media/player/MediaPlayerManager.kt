@@ -155,8 +155,8 @@ internal class MediaPlayerManager (context: Context,
             mMediaPlayer = MediaPlayer()
         }
         mMediaPlayer!!.setOnCompletionListener{
+            setNewState(PlaybackStateCompat.STATE_STOPPED)
             onCompletionListener?.onCompletion(it)
-            setNewState(PlaybackStateCompat.STATE_PAUSED)
         }
     }
 
