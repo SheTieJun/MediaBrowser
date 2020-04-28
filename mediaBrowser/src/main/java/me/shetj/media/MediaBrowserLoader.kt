@@ -8,6 +8,7 @@ import me.shetj.media.callback.NotificationHelper
 import me.shetj.media.callback.OnMediaStatusChangeListener
 import me.shetj.media.callback.OnSubscribeCallBack
 import me.shetj.media.loader.MediaBrowserHelper
+import me.shetj.media.loader.MediaConstant.Companion.COMMAND_CLEAR
 import java.lang.NullPointerException
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -90,10 +91,16 @@ object MediaBrowserLoader{
         browserManager.subscribe(parentId)
     }
 
+    /**
+     * @param isClearPlayList if true will stop media and clear list
+     */
     @JvmStatic
-    fun unSubscribe(parentId:String) {
+    fun unSubscribe(parentId:String,isClearPlayList:Boolean = true) {
         checkLoaderInit()
         browserManager.unSubscribe(parentId)
+        if (isClearPlayList) {
+            getMediaController()?.sendCommand(COMMAND_CLEAR, null, null)
+        }
     }
 
     /**

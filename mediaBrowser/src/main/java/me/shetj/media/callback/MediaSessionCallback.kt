@@ -9,11 +9,10 @@ import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import me.shetj.media.loader.MediaConstant
 import me.shetj.media.loader.MetadataUtil
-
 import me.shetj.media.player.MediaPlayerManager
-
-import java.util.ArrayList
+import java.util.*
 
 /**
  * [MediaSessionCallback]
@@ -92,6 +91,14 @@ internal class MediaSessionCallback(private val context: Context,
      */
     override fun onCommand(command: String?, extras: Bundle?, cb: ResultReceiver?) {
         super.onCommand(command, extras, cb)
+        if (command == MediaConstant.COMMAND_CLEAR){
+            clearMedia()
+        }
+    }
+
+    private fun clearMedia() {
+        mMediaPlayerManager.stop()
+        mPlaylist.clear()
     }
 
 
