@@ -17,12 +17,10 @@
 package me.shetj.media.notifications
 
 
-import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import android.os.Build
 import android.support.v4.media.MediaDescriptionCompat
-import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.annotation.RequiresApi
@@ -30,8 +28,8 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.media.session.MediaButtonReceiver
+import androidx.media2.session.MediaLibraryService
 import me.shetj.media.R
-import me.shetj.media.kt.isPlaying
 import me.shetj.media.kt.isSkipToNextEnabled
 import me.shetj.media.kt.isSkipToPreviousEnabled
 import me.shetj.media.loader.MediaBrowserHelper
@@ -40,7 +38,8 @@ import me.shetj.media.loader.MediaBrowserHelper
  * Keeps track of a notification and updates it automatically for a given MediaSession. This is
  * required so that the music service don't get killed during playback.
  */
-internal class MediaNotificationManager(private val mContext: Context) {
+internal class MediaNotificationManager(
+    private val mContext: Context) {
 
 
     private val mPlayAction: NotificationCompat.Action = NotificationCompat.Action(
@@ -76,14 +75,13 @@ internal class MediaNotificationManager(private val mContext: Context) {
         NotificationManagerCompat.from(mContext).cancel(MediaBrowserHelper.getNotificationID())
     }
 
-    fun getNotification(metadata: MediaMetadataCompat,
-                        state: PlaybackStateCompat,
-                        token: MediaSessionCompat.Token): Notification {
-        val isPlaying = state.isPlaying
-        val description = metadata.description
-        val builder = buildNotification(state, token, isPlaying, description)
-        return builder.build()
-    }
+//    fun getNotification(metadata: MediaMetadataCompat,
+//                        mediaSession: MediaSession
+//    ): Notification {
+////        val description = metadata.description
+////        val builder = buildNotification(state, token, isPlaying, description)
+////        return builder.build()
+//    }
 
     private fun buildNotification(state: PlaybackStateCompat,
                                   token: MediaSessionCompat.Token,

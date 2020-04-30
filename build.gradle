@@ -5,7 +5,7 @@ buildscript {
     ext.base_kt_version = "5e8978f294"
 
     ext.compileSdkVersion       = 29
-    ext.minVersion              = 21
+    ext.minVersion              = 29
     ext.versionCode             = 1
     ext.versionName             = "0.0.1"
     ext.exoplayer_version       = '2.10.0'

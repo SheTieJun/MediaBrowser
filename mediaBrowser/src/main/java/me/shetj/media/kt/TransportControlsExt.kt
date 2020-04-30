@@ -6,7 +6,7 @@ import me.shetj.media.MediaBrowserLoader
 
 
 fun MediaControllerCompat.TransportControls.startOrPause(){
-    when(MediaBrowserLoader.getMediaController()?.state()){
+    when(MediaBrowserLoader.getMediaController()?.playerState){
         PlaybackStateCompat.STATE_PLAYING ->{
             pause()
         }

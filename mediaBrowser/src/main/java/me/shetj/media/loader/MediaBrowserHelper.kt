@@ -71,7 +71,7 @@ internal object MediaBrowserHelper{
             return  notificationHelper?.getAlbumBitmap(mContext, mediaId)
         }
         return  BitmapFactory.decodeResource(mContext.resources,
-            if (MediaBrowserLoader.getMediaController()?.playbackState?.state
+            if (MediaBrowserLoader.getMediaController()?.playerState
                 == PlaybackStateCompat.STATE_PLAYING)
                 R.drawable.ic_media_with_pause else R.drawable.ic_media_with_play)
     }
@@ -124,13 +124,21 @@ internal object MediaBrowserHelper{
     ): PendingIntent {
         val controller = MediaControllerCompat(mContext, token)
         if (controller.sessionActivity == null){
-            val openUI =
-                mContext.packageManager.getLaunchIntentForPackage(mContext.packageName)
-            openUI?.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-            return PendingIntent.getActivity(
-                mContext, MediaNotificationManager.REQUEST_CODE, openUI, PendingIntent.FLAG_CANCEL_CURRENT)
+            return getActivity(mContext)
         }
         return controller.sessionActivity
+    }
+
+    internal fun getActivity(mContext: Context): PendingIntent {
+        val openUI =
+            mContext.packageManager.getLaunchIntentForPackage(mContext.packageName)
+        openUI?.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+        return PendingIntent.getActivity(
+            mContext,
+            MediaNotificationManager.REQUEST_CODE,
+            openUI,
+            PendingIntent.FLAG_CANCEL_CURRENT
+        )
     }
 
 }

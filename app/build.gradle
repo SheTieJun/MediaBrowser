@@ -39,11 +39,13 @@ dependencies {
 
     implementation project(path: ':mediaBrowser')
     implementation "com.github.SheTieJun:Base:$base_kt_version"
-    implementation 'androidx.media:media:1.1.0'
+    def media2_version = "1.0.3"
 
-    implementation "com.google.android.exoplayer:exoplayer-core:$exoplayer_version"
-    implementation "com.google.android.exoplayer:exoplayer-ui:$exoplayer_version"
-    implementation "com.google.android.exoplayer:extension-mediasession:$exoplayer_version"
+    // Interacting with MediaSessions
+    implementation "androidx.media2:media2-session:$media2_version"
+    // optional - Implementation of a SessionPlayer
+    implementation "androidx.media2:media2-player:$media2_version"
+    implementation "androidx.media2:media2-exoplayer:$media2_version"
 
     //因为需要添加网络请求音乐列表测试
     implementation 'com.zhouyou:rxeasyhttp:2.1.5'

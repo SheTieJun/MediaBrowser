@@ -50,6 +50,11 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.core:core-ktx:1.2.0'
-    implementation 'androidx.media:media:1.1.0'
+    def media2_version = "1.0.3"
 
+    // Interacting with MediaSessions
+    implementation "androidx.media2:media2-session:$media2_version"
+    // optional - Implementation of a SessionPlayer
+    implementation "androidx.media2:media2-player:$media2_version"
+    implementation "androidx.media2:media2-exoplayer:$media2_version"
 }

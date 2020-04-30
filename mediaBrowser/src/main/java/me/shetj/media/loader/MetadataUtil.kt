@@ -19,7 +19,7 @@ package me.shetj.media.loader
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.support.v4.media.MediaMetadataCompat
+import androidx.media2.common.MediaMetadata
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit
 object MetadataUtil {
 
     // 构造音频数据
-    private val music = TreeMap<String, MediaMetadataCompat>()
+    private val music = TreeMap<String, MediaMetadata>()
     // 图片资源id
     private val albumRes = HashMap<String, String>()
     // 音频播放路径
@@ -58,27 +58,27 @@ object MetadataUtil {
      * @param mediaId
      * @return
      */
-    fun getMetadata(context: Context, mediaId: String): MediaMetadataCompat {
+    fun getMetadata(context: Context, mediaId: String): MediaMetadata {
         // 根据id 音频列表获取音频数据
         val metadataWithoutBitmap = music[mediaId]
         // 获取音频图片数据
         val albumArt = getAlbumBitmap(context, mediaId)
-        val builder = MediaMetadataCompat.Builder()
+        val builder = MediaMetadata.Builder()
         // 设置数据
         for (key in arrayOf(
-            MediaMetadataCompat.METADATA_KEY_MEDIA_ID,
-            MediaMetadataCompat.METADATA_KEY_ALBUM,
-            MediaMetadataCompat.METADATA_KEY_ARTIST,
-            MediaMetadataCompat.METADATA_KEY_GENRE,
-            MediaMetadataCompat.METADATA_KEY_TITLE)) {
+            MediaMetadata.METADATA_KEY_MEDIA_ID,
+            MediaMetadata.METADATA_KEY_ALBUM,
+            MediaMetadata.METADATA_KEY_ARTIST,
+            MediaMetadata.METADATA_KEY_GENRE,
+            MediaMetadata.METADATA_KEY_TITLE)) {
             builder.putString(key, metadataWithoutBitmap!!.getString(key))
         }
         //
         builder.putLong(
-            MediaMetadataCompat.METADATA_KEY_DURATION,
-            metadataWithoutBitmap!!.getLong(MediaMetadataCompat.METADATA_KEY_DURATION))
+            MediaMetadata.METADATA_KEY_DURATION,
+            metadataWithoutBitmap!!.getLong(MediaMetadata.METADATA_KEY_DURATION))
         // 添加图片
-        builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, albumArt)
+        builder.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, albumArt)
         return builder.build()
     }
 
@@ -90,19 +90,19 @@ object MetadataUtil {
                                durationUnit: TimeUnit,
                                genre: String= "",
                                title: String= ""
-                               ,fileUrl:String =""): MediaMetadataCompat{
+                               ,fileUrl:String =""): MediaMetadata{
         albumRes[mediaId] = album
         musicFileName[mediaId] = fileUrl
-        val metadataCompat = MediaMetadataCompat.Builder()
-            .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, mediaId)
-            .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, album)
-            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, artist)
-            .putLong(MediaMetadataCompat.METADATA_KEY_DURATION,
+        val metadataCompat = MediaMetadata.Builder()
+            .putString(MediaMetadata.METADATA_KEY_MEDIA_ID, mediaId)
+            .putString(MediaMetadata.METADATA_KEY_ALBUM, album)
+            .putString(MediaMetadata.METADATA_KEY_ARTIST, artist)
+            .putLong(MediaMetadata.METADATA_KEY_DURATION,
                 TimeUnit.MILLISECONDS.convert(duration, durationUnit))
-            .putString(MediaMetadataCompat.METADATA_KEY_GENRE, genre)
-            .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, album)
-            .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI, album)
-            .putString(MediaMetadataCompat.METADATA_KEY_TITLE, title)
+            .putString(MediaMetadata.METADATA_KEY_GENRE, genre)
+            .putString(MediaMetadata.METADATA_KEY_ALBUM_ART_URI, album)
+            .putString(MediaMetadata.METADATA_KEY_DISPLAY_ICON_URI, album)
+            .putString(MediaMetadata.METADATA_KEY_TITLE, title)
             .build()
         music[mediaId] = metadataCompat
         return metadataCompat

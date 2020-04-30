@@ -3,6 +3,9 @@ package me.shetj.media
 import android.content.Context
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import androidx.media2.common.SessionPlayer
+import androidx.media2.session.MediaController
+import androidx.media2.session.SessionCommand
 import me.shetj.media.browser.MediaBrowserManager
 import me.shetj.media.callback.NotificationHelper
 import me.shetj.media.callback.OnMediaStatusChangeListener
@@ -13,62 +16,27 @@ import java.lang.NullPointerException
 import java.util.concurrent.atomic.AtomicBoolean
 
 object MediaBrowserLoader{
-
-    private lateinit var browserManager: MediaBrowserManager
-    private val isInit = AtomicBoolean(false)
+    private var browserManager = MediaBrowserManager.getInstance()
     private val isStart = AtomicBoolean(false)
-
-    /**
-     * 初始化，必须执行的方法
-     */
-    @JvmStatic
-    fun init() :MediaBrowserLoader{
-        if (!isInit.get()) {
-            browserManager = MediaBrowserManager.getInstance()
-            isInit.compareAndSet(false,true)
-        }
-        return this
-    }
 
     /**
      * 1、如果音乐服务没有开启，就开始服务
      * 2、连接服务
      */
     @JvmStatic
-    fun start(context: Context){
+    fun startBrowser(context: Context){
         checkLoaderInit()
         browserManager.onStart(context.applicationContext)
         isStart.compareAndSet(false,true)
     }
 
     /**
-     * 获取音乐控制器
-     */
-    @JvmStatic
-    fun getTransportControls(): MediaControllerCompat.TransportControls? {
-        checkLoaderInit()
-        return browserManager.transportControls
-    }
-
-    /**
      * 获取[MediaControllerCompat]
      */
     @JvmStatic
-    fun getMediaController(): MediaControllerCompat? {
+    fun getMediaController(): MediaController? {
         checkLoaderInit()
         return browserManager.getMediaController()
-    }
-
-    /**
-     * 停止更新界面，但是没有关闭服务
-     * 当下一次链接服务
-     */
-    @JvmStatic
-    fun stop(){
-        if (isStart.get()) {
-            browserManager.onStop()
-            isStart.set(false)
-        }
     }
 
     /**
@@ -77,8 +45,8 @@ object MediaBrowserLoader{
      * TODO 替换到exoPlayer?
      */
     @JvmStatic
-    private fun setRepeatMode(@PlaybackStateCompat.RepeatMode repeatMode:Int){
-        getTransportControls()?.setRepeatMode(repeatMode)
+    private fun setRepeatMode(@SessionPlayer.RepeatMode repeatMode:Int){
+        getMediaController()?.repeatMode = repeatMode
     }
 
     /**
@@ -99,7 +67,7 @@ object MediaBrowserLoader{
         checkLoaderInit()
         browserManager.unSubscribe(parentId)
         if (isClearPlayList) {
-            getMediaController()?.sendCommand(COMMAND_CLEAR, null, null)
+            getMediaController()?.sendCustomCommand(SessionCommand(COMMAND_CLEAR, null), null)
         }
     }
 
@@ -156,8 +124,8 @@ object MediaBrowserLoader{
     /***********************************私有方法***************************************************/
 
     private fun checkLoaderInit() {
-        if (!isInit.get()) {
-            throw Exception("u should init first")
+        if (!isStart.get()) {
+            throw Exception("u should start")
         }
     }
 
