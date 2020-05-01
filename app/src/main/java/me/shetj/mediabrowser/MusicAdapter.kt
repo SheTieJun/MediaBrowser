@@ -2,13 +2,15 @@ package me.shetj.mediabrowser
 
 import android.annotation.SuppressLint
 import android.graphics.Color
-import android.support.v4.media.MediaBrowserCompat
+import androidx.media2.common.MediaItem
+import androidx.media2.common.MediaMetadata
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
+import me.shetj.media.kt.getMediaIdString
 import timber.log.Timber
 
-class MusicAdapter(data: MutableList<MediaBrowserCompat.MediaItem>) :
-    BaseQuickAdapter<MediaBrowserCompat.MediaItem, BaseViewHolder>(
+class MusicAdapter(data: MutableList<MediaItem>) :
+    BaseQuickAdapter<MediaItem, BaseViewHolder>(
         R.layout.item_select_music2,
         data
     ) {
@@ -32,9 +34,9 @@ class MusicAdapter(data: MutableList<MediaBrowserCompat.MediaItem>) :
     val GB = 1073741824
 
 
-    override fun convert(helper: BaseViewHolder, item: MediaBrowserCompat.MediaItem) {
+    override fun convert(helper: BaseViewHolder, item: MediaItem) {
         val itemPosition = helper.adapterPosition - headerLayoutCount
-        helper.setText(R.id.tv_music_name, item.description.title)
+        helper.setText(R.id.tv_music_name, item.getMediaIdString())
             .setTextColor(
                 R.id.tv_music_name, when (itemPosition == position) {
                     true -> Color.RED
@@ -87,7 +89,7 @@ class MusicAdapter(data: MutableList<MediaBrowserCompat.MediaItem>) :
     fun selectMediaId(mediaId: String?) {
         mediaId?.let {
             data.forEach {
-                if (it.description.mediaId == mediaId) {
+                if (it.getMediaIdString() == mediaId) {
                     setSelectPosition(data.indexOf(it))
                 }
             }

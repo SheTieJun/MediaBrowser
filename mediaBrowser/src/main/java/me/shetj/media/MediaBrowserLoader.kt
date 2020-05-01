@@ -1,10 +1,10 @@
 package me.shetj.media
 
 import android.content.Context
-import android.support.v4.media.session.MediaControllerCompat
-import android.support.v4.media.session.PlaybackStateCompat
+import android.os.Bundle
 import androidx.media2.common.SessionPlayer
-import androidx.media2.session.MediaController
+import androidx.media2.session.MediaBrowser
+import androidx.media2.session.MediaLibraryService
 import androidx.media2.session.SessionCommand
 import me.shetj.media.browser.MediaBrowserManager
 import me.shetj.media.callback.NotificationHelper
@@ -12,7 +12,6 @@ import me.shetj.media.callback.OnMediaStatusChangeListener
 import me.shetj.media.callback.OnSubscribeCallBack
 import me.shetj.media.loader.MediaBrowserHelper
 import me.shetj.media.loader.MediaConstant.Companion.COMMAND_CLEAR
-import java.lang.NullPointerException
 import java.util.concurrent.atomic.AtomicBoolean
 
 object MediaBrowserLoader{
@@ -25,18 +24,36 @@ object MediaBrowserLoader{
      */
     @JvmStatic
     fun startBrowser(context: Context){
-        checkLoaderInit()
         browserManager.onStart(context.applicationContext)
         isStart.compareAndSet(false,true)
+//        getLibraryRoot()
     }
+
 
     /**
      * 获取[MediaControllerCompat]
      */
     @JvmStatic
-    fun getMediaController(): MediaController? {
+    fun getMediaController(): MediaBrowser? {
         checkLoaderInit()
-        return browserManager.getMediaController()
+        return browserManager.getMediaBrowser()
+    }
+
+    fun getLibraryRoot() {
+        getMediaController()?.getLibraryRoot(getLibraryParams(mRecent = true,mOffline = true,mSuggested = true))
+    }
+
+    @JvmOverloads
+    fun getLibraryParams( mRecent: Boolean = false,
+                          mOffline: Boolean = false,
+                          mSuggested :Boolean= false,
+                          extras: Bundle?=null): MediaLibraryService.LibraryParams {
+       return MediaLibraryService.LibraryParams.Builder()
+            .setExtras(extras)
+            .setRecent(mRecent)
+            .setOffline(mOffline)
+            .setSuggested(mSuggested)
+            .build()
     }
 
     /**
@@ -125,7 +142,7 @@ object MediaBrowserLoader{
 
     private fun checkLoaderInit() {
         if (!isStart.get()) {
-            throw Exception("u should start")
+            throw IllegalStateException("u should start")
         }
     }
 
@@ -135,5 +152,4 @@ object MediaBrowserLoader{
                     "addMediaLoadDataCallBack(parentMediaId:String, callBack: OnSubscribeCallBack)")
         }
     }
-
 }

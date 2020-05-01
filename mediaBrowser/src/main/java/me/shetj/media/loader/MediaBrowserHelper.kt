@@ -9,13 +9,15 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Build
-import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationManagerCompat
-import androidx.media.MediaBrowserServiceCompat
+import androidx.media2.common.BaseResult.RESULT_ERROR_UNKNOWN
+import androidx.media2.common.SessionPlayer
+import androidx.media2.session.MediaLibraryService
+import androidx.media2.session.MediaSession
 import me.shetj.media.MediaBrowserLoader
 import me.shetj.media.R
 import me.shetj.media.callback.NotificationHelper
@@ -55,11 +57,20 @@ internal object MediaBrowserHelper{
         }
     }
 
-    internal fun onLoadChildren(parentMediaId: String, result: MediaBrowserServiceCompat.Result<List<MediaBrowserCompat.MediaItem>>) {
-        val callBack = mediaLoadDataCallBack[parentMediaId]
+    /**
+     * RESULT_SUCCESS 成功
+     * RESULT_ERROR_UNKNOWN 失败
+     */
+    internal fun onSubscribe(
+        sessionPlayer: SessionPlayer,
+        controller: MediaSession.ControllerInfo,
+        parentId: String,
+        params: MediaLibraryService.LibraryParams?): Int {
+        val callBack = mediaLoadDataCallBack[parentId]
         callBack?.let {
-            callBack.onLoadChildren(parentMediaId, result)
+         return   callBack.onSubscribe(sessionPlayer, controller, parentId, params)
         }
+        return RESULT_ERROR_UNKNOWN
     }
 
     internal fun checkParentId(parentId: String): Boolean {

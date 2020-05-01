@@ -1,9 +1,9 @@
 package me.shetj.media.callback
 
-import android.support.v4.media.MediaBrowserCompat
-import android.support.v4.media.MediaMetadataCompat
-import android.support.v4.media.session.MediaSessionCompat
-import android.support.v4.media.session.PlaybackStateCompat
+import androidx.media2.common.MediaItem
+import androidx.media2.common.MediaMetadata
+import androidx.media2.common.SessionPlayer
+import androidx.media2.session.MediaController
 
 /**
  * 音频变化回调
@@ -17,20 +17,26 @@ interface OnMediaStatusChangeListener {
     /**
      * 播放状态修改
      */
-    fun onPlaybackStateChanged(state: PlaybackStateCompat?)
+    fun onPlayerStateChanged(@SessionPlayer.PlayerState  state:Int)
 
     /**
      * 当前播放歌曲信息修改
      */
-    fun onMetadataChanged(metadata: MediaMetadataCompat?)
+    fun onPlaylistMetadataChanged(metadata: MediaMetadata?)
 
     /**
      * 播放队列修改
      */
-    fun onQueueChanged(queue: List<MediaSessionCompat.QueueItem>?)
+    fun onPlaylistChanged(list: MutableList<MediaItem>?, metadata: MediaMetadata?)
 
     /**
-     * 获取数据成功回调
+     * 播放完成
      */
-    fun onChildrenLoaded(parentId: String, children: List<MediaBrowserCompat.MediaItem>)
+    fun onPlaybackCompleted()
+
+
+    /**
+     * 倍数修改
+     */
+    fun onPlaybackSpeedChanged(controller: MediaController, speed: Float)
 }

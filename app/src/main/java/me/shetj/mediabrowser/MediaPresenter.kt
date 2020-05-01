@@ -61,7 +61,7 @@ class MediaPresenter(view: IView) : BasePresenter<MediaModel>(view) {
     }
 
     //模拟网络请求
-    fun loadNetMusic(onSuccess: ((List<NetMusic>?) -> Unit)? = null) {
+   inline fun loadNetMusic(crossinline onSuccess: (List<NetMusic>?) -> Unit) {
         val dateInfo = "{\"msg\": \"ok\", \"code\": 0, \"data\": [\n" +
                 "{\"url\": \"https://media.lycheer.net/lecture/6583/5dba9468334c6837aee49262_transcoded.m4a\", \"title\": \"温暖春天的爱情\", \"duration\":\"180\", \"imgUrl\": \"https://img.lycheer.net/material/6583/5d70da288069bd42ddc9a961.png\"},\n" +
                 "{\"url\": \"https://media.lycheer.net/lecture/6583/5dba946faa26622516464ad3_transcoded.m4a\", \"title\": \"浪漫的灵感\", \"duration\":\"150\", \"imgUrl\": \"https://img.lycheer.net/material/6583/5d6b813e06d1a720bf6a8b33.png\"}\n" +
@@ -71,7 +71,7 @@ class MediaPresenter(view: IView) : BasePresenter<MediaModel>(view) {
             .execute(object : SimpleCallBack<String>() {
 
                 override fun onError(e: ApiException?) {
-                    onSuccess?.invoke(
+                    onSuccess.invoke(
                         GsonKit.jsonToBean(
                             dateInfo,
                             NetMusicResult::class.java
@@ -81,7 +81,7 @@ class MediaPresenter(view: IView) : BasePresenter<MediaModel>(view) {
 
                 override fun onSuccess(t: String?) {
                     Timber.i(t)
-                    onSuccess?.invoke(
+                    onSuccess.invoke(
                         GsonKit.jsonToBean(
                             dateInfo,
                             NetMusicResult::class.java
