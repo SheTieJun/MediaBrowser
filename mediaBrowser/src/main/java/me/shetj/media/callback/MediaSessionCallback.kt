@@ -97,6 +97,7 @@ internal class MediaSessionCallback(private val context: Context,
     }
 
     private fun clearMedia() {
+        mQueueIndex = -1
         mMediaPlayerManager.stop()
         mPlaylist.clear()
     }

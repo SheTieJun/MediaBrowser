@@ -25,8 +25,11 @@ dependencies {
 ```
 
 
-#### [如何使用](./app/src/main/java/me/shetj/mediabrowser/MainActivity.kt) 
+#### [如何使用](https://github.com/SheTieJun/MediaBrowser/blob/master/app/src/main/java/me/shetj/mediabrowser/MainActivity.kt)
+<img src="https://github.com/SheTieJun/MediaBrowser/blob/master/doc/img/demo.gif" width="32%" height="32%" /><img src="https://github.com/SheTieJun/MediaBrowser/blob/master/doc/img/demo_pic1.jpg" width="32%" height="32%" /><img src="https://github.com/SheTieJun/MediaBrowser/blob/master/doc/img/demo_pic2.jpg" width="32%" height="32%"/>
+
 初始化
+
 ```  // onLoadChildren 这个方法会在     MediaBrowserLoader.subscribe(parentId) 之后回调
       MediaBrowserLoader.init() //必须执行
                 .addOnMediaStatusListener(this)
@@ -86,10 +89,16 @@ dependencies {
 
 [具体方法](./mediaBrowser/src/main/java/me/shetj/media/MediaBrowserLoader.kt)
 
-获取当前时间，如果是播放中可以没300ms循环调用一次
+获取当前时间，如果是播放中,可以每300ms循环调用一次
 
+比如：
 ```
-playbackStateCompat?.currentPlayBackPosition
+Flowable.interval(300, TimeUnit.MILLISECONDS)
+                .compose(RxLifecycle.bindUntilEvent(lifecycle(), ActivityEvent.DESTROY))
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext {
+                    time.text = playbackStateCompat?.currentPlayBackPosition?.let{MusicUtils.formatTime(it)}
+                }.subscribe()
 ```
 
 获取总时长
@@ -107,6 +116,7 @@ playbackStateCompat?.currentPlayBackPosition
 2. 订阅流程：`MediaBrowserLoader.subscribe(parentId)` -> `onLoadChildren()` -> `result.sendResult(it)`-> `onChildrenLoaded()`
 3. 取消订阅：`MediaBrowserLoader.unSubscribe(parentId)`
 4. 如果切换订阅，必须先取消上一个的订阅，再订阅新的
+5. 判断是否是否可以订阅 `MediaBrowserLoader.isCanSubscribe()`
 
 ### 注意点
 如果使用本地文件，并且targetSdkVersion >= 29
@@ -117,3 +127,7 @@ playbackStateCompat?.currentPlayBackPosition
         android:requestLegacyExternalStorage="true"
    >     
 ```
+
+如果你要换ICON,可以在app Module,使用相同名称的资源名称，就可以替换了
+
+### 建议拉下来自己在改一波

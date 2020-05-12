@@ -3,6 +3,7 @@ package me.shetj.media
 import android.content.Context
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import android.util.Log
 import me.shetj.media.browser.MediaBrowserManager
 import me.shetj.media.callback.NotificationHelper
 import me.shetj.media.callback.OnMediaStatusChangeListener
@@ -17,7 +18,7 @@ object MediaBrowserLoader{
     private lateinit var browserManager: MediaBrowserManager
     private val isInit = AtomicBoolean(false)
     private val isStart = AtomicBoolean(false)
-
+    var currentParentId: String ? = null
     /**
      * 初始化，必须执行的方法
      */
@@ -59,6 +60,8 @@ object MediaBrowserLoader{
         return browserManager.getMediaController()
     }
 
+    fun isCanSubscribe() = currentParentId.isNullOrEmpty()
+
     /**
      * 停止更新界面，但是没有关闭服务
      * 当下一次链接服务
@@ -86,8 +89,13 @@ object MediaBrowserLoader{
      */
     @JvmStatic
     fun subscribe(parentId:String) {
+        if (!isCanSubscribe()){
+            Log.e("MediaBrowserLoader","u should unSubscribe( currentParentId ) first")
+            return
+        }
         checkLoaderInit()
         checkHelper(parentId)
+        currentParentId = parentId
         browserManager.subscribe(parentId)
     }
 
@@ -96,7 +104,12 @@ object MediaBrowserLoader{
      */
     @JvmStatic
     fun unSubscribe(parentId:String,isClearPlayList:Boolean = true) {
+        if (!isCanSubscribe() && currentParentId != parentId){
+            Log.e("MediaBrowserLoader","u should unSubscribe( $currentParentId ) , not $parentId")
+            return
+        }
         checkLoaderInit()
+        currentParentId = null
         browserManager.unSubscribe(parentId)
         if (isClearPlayList) {
             getMediaController()?.sendCommand(COMMAND_CLEAR, null, null)

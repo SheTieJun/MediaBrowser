@@ -227,9 +227,13 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
     //region 回调部分
     override fun connectionCallback(isSuccess: Boolean) {
         Timber.w("connectionCallback:$isSuccess")
-        if (isSuccess) {
-            //连接成功，默认初始化网络数据
-            subscribeNetWorkMusic()
+        if (isSuccess && MediaBrowserLoader.isCanSubscribe()) {
+            if (MediaBrowserLoader.currentParentId != parentId2) {
+                //连接成功，默认初始化网络数据
+                subscribeNetWorkMusic()
+            }else{
+                subscribeLocalMusic()
+            }
         }
     }
 
