@@ -3,10 +3,10 @@ package me.shetj.media.kt
 import android.net.Uri
 import android.os.ParcelFileDescriptor
 import android.os.ParcelFileDescriptor.MODE_READ_ONLY
+import android.os.ParcelFileDescriptor.MODE_READ_WRITE
 import androidx.media2.common.FileMediaItem
 import androidx.media2.common.MediaItem
 import androidx.media2.common.MediaMetadata
-import androidx.media2.common.MediaMetadata.METADATA_KEY_MEDIA_URI
 import androidx.media2.common.UriMediaItem
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -20,7 +20,7 @@ fun MediaMetadata.toMediaItem():MediaItem{
 }
 
 fun getMediaMetadataCompat(mediaId: String = "",
-                           album: String = "",
+                           album: String = "https://www.google.com/url?sa=i&url=http%3A%2F%2Fpic.netbian.com%2Ftupian%2F4780.html&psig=AOvVaw3XAWdpJgCAlXCkk5VdUNa-&ust=1599277872026000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCMDRz7zMzusCFQAAAAAdAAAAABAN",
                            artist: String = "",
                            duration: Long = 0L,
                            durationUnit: TimeUnit,
@@ -45,14 +45,15 @@ fun MediaItem?.getMediaIdString():String{
     return this?.metadata?.mediaId ?:""
 }
 
-fun MediaMetadata.toFileItem():FileMediaItem{
-
-    return FileMediaItem.Builder(ParcelFileDescriptor.open(File(getString(MediaMetadata.METADATA_KEY_MEDIA_URI)),MODE_READ_ONLY))
-        .setMetadata(this).build()
+fun MediaMetadata.toFileItem():UriMediaItem{
+    return UriMediaItem.Builder(Uri.parse(getString(MediaMetadata.METADATA_KEY_MEDIA_URI)))
+        .setMetadata(this)
+        .build()
 
 }
 
 fun MediaMetadata.toUriItem():UriMediaItem{
     return UriMediaItem.Builder(Uri.parse(getString(MediaMetadata.METADATA_KEY_MEDIA_URI)))
-        .setMetadata(this).build()
+        .setMetadata(this)
+        .build()
 }

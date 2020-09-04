@@ -36,7 +36,7 @@ class MusicAdapter(data: MutableList<MediaItem>) :
 
     override fun convert(helper: BaseViewHolder, item: MediaItem) {
         val itemPosition = helper.adapterPosition - headerLayoutCount
-        helper.setText(R.id.tv_music_name, item.getMediaIdString())
+        helper.setText(R.id.tv_music_name, "$itemPosition :${item.getMediaIdString()}")
             .setTextColor(
                 R.id.tv_music_name, when (itemPosition == position) {
                     true -> Color.RED
@@ -46,6 +46,18 @@ class MusicAdapter(data: MutableList<MediaItem>) :
         addChildClickViewIds(R.id.tv_play)
     }
 
+
+    override fun convert(helper: BaseViewHolder, item: MediaItem, payloads: List<Any>) {
+        super.convert(helper, item, payloads)
+        val itemPosition = helper.adapterPosition - headerLayoutCount
+        helper
+            .setTextColor(
+                R.id.tv_music_name, when (itemPosition == position) {
+                    true -> Color.RED
+                    false -> Color.BLACK
+                }
+            )
+    }
     /**
      * 设置选中的位置
      */
@@ -56,10 +68,10 @@ class MusicAdapter(data: MutableList<MediaItem>) :
             val old: Int = position
             this.position = targetPos
             if (old != -1) {
-                notifyItemChanged(old + headerLayoutCount)
+                notifyItemChanged(old + headerLayoutCount,false)
             }
             if (targetPos != -1) {
-                notifyItemChanged(targetPos + headerLayoutCount)
+                notifyItemChanged(targetPos + headerLayoutCount,false)
             }
         }
     }

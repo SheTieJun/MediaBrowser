@@ -15,22 +15,19 @@ import me.shetj.media.loader.MediaBrowserHelper
  */
 class MusicService : MediaLibraryService() {
     private var mMediaSession: MediaLibrarySession? = null
-    private val mMediaPlayer: MediaPlayer by lazy {
-        MediaPlayer(this)
-    }
     override fun onCreate() {
         super.onCreate()
         // 创建MediaSessionCompat
         mMediaSession = MediaLibrarySession.Builder(
             this,
-             mMediaPlayer,
+            MediaPlayer(this),
             ContextCompat.getMainExecutor(this),
-            object :MediaLibrarySession.MediaLibrarySessionCallback(){
+            object : MediaLibrarySession.MediaLibrarySessionCallback() {
                 override fun onConnect(
                     session: MediaSession,
                     controller: MediaSession.ControllerInfo
                 ): SessionCommandGroup? {
-                    Log.i("MediaBrowser","onConnect  MusicService"  )
+                    Log.i("MediaBrowser", "onConnect  MusicService")
                     return super.onConnect(session, controller)
                 }
 
@@ -40,7 +37,7 @@ class MusicService : MediaLibraryService() {
                     customCommand: SessionCommand,
                     args: Bundle?
                 ): SessionResult {
-                    Log.i("MediaBrowser","onCustomCommand  MusicService"  )
+                    Log.i("MediaBrowser", "onCustomCommand  MusicService")
                     return super.onCustomCommand(session, controller, customCommand, args)
                 }
 
@@ -53,7 +50,7 @@ class MusicService : MediaLibraryService() {
                     pageSize: Int,
                     params: LibraryParams?
                 ): LibraryResult {
-                    Log.i("MediaBrowser","onCustomCommand  MusicService"  )
+                    Log.i("MediaBrowser", "onCustomCommand  MusicService")
                     return super.onGetChildren(
                         session,
                         controller,
@@ -64,6 +61,36 @@ class MusicService : MediaLibraryService() {
                     )
                 }
 
+                override fun onFastForward(
+                    session: MediaSession,
+                    controller: MediaSession.ControllerInfo
+                ): Int {
+                    Log.i("MediaBrowser", "onFastForward  MusicService")
+                    return SessionResult.RESULT_SUCCESS
+                }
+
+                override fun onRewind(
+                    session: MediaSession,
+                    controller: MediaSession.ControllerInfo
+                ): Int {
+                    Log.i("MediaBrowser", "onRewind  MusicService")
+                    return  SessionResult.RESULT_SUCCESS
+                }
+
+                override fun onSkipBackward(
+                    session: MediaSession,
+                    controller: MediaSession.ControllerInfo
+                ): Int {
+                    Log.i("MediaBrowser", "onSkipBackward  MusicService")
+                    return SessionResult.RESULT_SUCCESS
+                }
+
+                override fun onSkipForward(
+                    session: MediaSession,
+                    controller: MediaSession.ControllerInfo
+                ): Int {
+                    return SessionResult.RESULT_SUCCESS
+                }
 
                 override fun onSubscribe(
                     session: MediaLibrarySession,
@@ -71,8 +98,13 @@ class MusicService : MediaLibraryService() {
                     parentId: String,
                     params: LibraryParams?
                 ): Int {
-                    Log.i("MediaBrowser","onSubscribe  $parentId MusicService"  )
-                    return  MediaBrowserHelper.onSubscribe(session.player, controller, parentId, params)
+                    Log.i("MediaBrowser", "onSubscribe  $parentId MusicService")
+                    return MediaBrowserHelper.onSubscribe(
+                        session.player,
+                        controller,
+                        parentId,
+                        params
+                    )
                 }
 
 
@@ -81,11 +113,10 @@ class MusicService : MediaLibraryService() {
                     controller: MediaSession.ControllerInfo,
                     parentId: String
                 ): Int {
-                    Log.i("MediaBrowser","onUnsubscribe  $parentId MusicService"  )
+                    Log.i("MediaBrowser", "onUnsubscribe  $parentId MusicService")
                     session.player.playlist?.clear()
                     return RESULT_SUCCESS
                 }
-
 
 
             }
@@ -94,25 +125,25 @@ class MusicService : MediaLibraryService() {
             .setId("MediaSessionService")
             .setSessionActivity(MediaBrowserHelper.getActivity(this))
             .build()
-        Log.i("MediaBrowser","mMediaSession create  MusicService"  )
+        Log.i("MediaBrowser", "mMediaSession create  MusicService")
     }
 
 
 
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaLibrarySession? {
-        Log.i("MediaBrowser","onGetSession  MusicService"  )
+        Log.i("MediaBrowser", "onGetSession  MusicService")
         return mMediaSession
     }
 
     override fun onTaskRemoved(rootIntent: Intent) {
         super.onTaskRemoved(rootIntent)
-        Log.i("MediaBrowser","onTaskRemoved  MusicService"  )
+        Log.i("MediaBrowser", "onTaskRemoved  MusicService")
         stopSelf()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.i("MediaBrowser","onStartCommand  MusicService"  )
+        Log.i("MediaBrowser", "onStartCommand  MusicService")
         return super.onStartCommand(intent, flags, startId)
     }
 
@@ -122,9 +153,7 @@ class MusicService : MediaLibraryService() {
 
     override fun onDestroy() {
         super.onDestroy()
+        mMediaSession?.close()
     }
-
-
-
 
 }

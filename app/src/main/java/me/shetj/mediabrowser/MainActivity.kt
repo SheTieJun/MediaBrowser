@@ -14,10 +14,7 @@ import me.shetj.base.kt.getRxPermissions
 import me.shetj.media.MediaBrowserLoader
 import me.shetj.media.callback.OnMediaStatusChangeListener
 import me.shetj.media.callback.OnSubscribeCallBack
-import me.shetj.media.kt.getMediaMetadataCompat
-import me.shetj.media.kt.toFileItem
-import me.shetj.media.kt.toMediaItem
-import me.shetj.media.kt.toUriItem
+import me.shetj.media.kt.*
 import java.util.concurrent.TimeUnit
 
 class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener {
@@ -35,6 +32,10 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
         btn_changeMusic.setOnClickListener {
             changeSubscribeMusic()
         }
+        floatingActionButton.setOnClickListener {
+            startOrPause()
+        }
+        onPlayerStateChanged(MediaBrowserLoader.getMediaController().playerState)
     }
 
 
@@ -114,14 +115,12 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
 
     override fun initData() {
         mPresenter = MediaPresenter(this)
-        mAdapter = MusicAdapter(ArrayList())
+        mAdapter = MusicAdapter(MediaBrowserLoader.getMediaController().playlist ?:ArrayList())
         iRecyclerView.adapter = mAdapter
         mAdapter.setOnItemClickListener { _, _, position ->
             run {
                 val item = mAdapter.getItem(position)
-                MediaBrowserLoader.getMediaController()?.skipToPlaylistItem(position)
-                MediaBrowserLoader.getMediaController()?.prepare()
-                MediaBrowserLoader.getMediaController()?.play()
+                MediaBrowserLoader.playPosition(item)
             }
         }
     }
@@ -132,7 +131,7 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
 
 
     //region 创建MediaItem
-    private fun createMediaItemAlbum(music: Music): FileMediaItem {
+    private fun createMediaItemAlbum(music: Music): UriMediaItem {
         return getMediaMetadataCompat(
             mediaId = music.name!!,
             album = music.img!!,
@@ -146,7 +145,7 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
 
     private fun createMediaItemAlbum(music: NetMusic): UriMediaItem {
         return  getMediaMetadataCompat(
-            mediaId = music.url!!,
+            mediaId = music.title!!,
             album = music.imgUrl!!,
             duration = 214112,
             durationUnit = TimeUnit.MILLISECONDS,
@@ -212,16 +211,7 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
 
     private fun subscribeNetWorkMusic() {
         btn_changeMusic.text = parentId2
-        MediaBrowserLoader.unSubscribe(parentId)
         MediaBrowserLoader.subscribe(parentId2)
-
-        //建议时先获取网络列表，在进行订阅
-        //   mPresenter?.loadNetMusic {
-        //     成功后，先保存数据，然后切换
-        //              btn_changeMusic.text = parentId2
-        //        MediaBrowserLoader.unSubscribe(parentId)
-        //        MediaBrowserLoader.subscribe(parentId2)
-        //  }
     }
     //endregion
 
@@ -242,16 +232,17 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
         }
     }
 
-    override fun onPlaylistMetadataChanged(metadata: MediaMetadata?) {
-        mAdapter.selectMediaId(metadata?.mediaId)
+    override fun onPlaylistMetadataChanged(metadata: MediaItem?) {
+        mAdapter.selectMediaId(metadata?.metadata?.mediaId)
     }
 
     override fun onPlaylistChanged(list: MutableList<MediaItem>?, metadata: MediaMetadata?) {
         mAdapter.setNewData(list)
-        mAdapter.selectMediaId(metadata?.mediaId)
+        MediaBrowserLoader.getMediaController().skipToPlaylistItem(0)
     }
 
     override fun onPlaybackCompleted() {
+
     }
 
     override fun onPlaybackSpeedChanged(controller: MediaController, speed: Float) {

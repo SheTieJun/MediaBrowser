@@ -22,7 +22,7 @@ interface OnMediaStatusChangeListener {
     /**
      * 当前播放歌曲信息修改
      */
-    fun onPlaylistMetadataChanged(metadata: MediaMetadata?)
+    fun onPlaylistMetadataChanged(metadata: MediaItem?)
 
     /**
      * 播放队列修改

@@ -43,7 +43,7 @@ object MusicUtils {
                         music.size = size
                         music.url = url
                         music.duration = duration
-                        music.img = album
+                        music.img = "https://www.google.com/url?sa=i&url=http%3A%2F%2Fpic.netbian.com%2Ftupian%2F4780.html&psig=AOvVaw3XAWdpJgCAlXCkk5VdUNa-&ust=1599277872026000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCMDRz7zMzusCFQAAAAAdAAAAABAN"
                         musicList.add(music)
                     }
                 } while (cursor.moveToNext())

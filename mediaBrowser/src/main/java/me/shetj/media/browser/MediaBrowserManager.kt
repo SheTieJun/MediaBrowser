@@ -6,7 +6,9 @@ import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.media2.common.MediaItem
 import androidx.media2.common.MediaMetadata
+import androidx.media2.common.SessionPlayer
 import androidx.media2.common.SessionPlayer.PLAYER_STATE_PLAYING
+import androidx.media2.common.SubtitleData
 import androidx.media2.session.*
 import me.shetj.media.callback.OnMediaStatusChangeListener
 import me.shetj.media.service.MusicService
@@ -30,8 +32,11 @@ internal class MediaBrowserManager private constructor() {
     private val mMediaStatusChangeListenerList = ArrayList<OnMediaStatusChangeListener>()
 
 
-    fun getMediaBrowser(): MediaBrowser? {
-        return mMediaBrowser
+    /**
+     * 必须start
+     */
+    fun getMediaBrowser(): MediaBrowser {
+        return mMediaBrowser!!
     }
 
     // ########################################音频变化回调 管理列表###################################################
@@ -63,7 +68,6 @@ internal class MediaBrowserManager private constructor() {
                             }
                             Log.i("MediaBrowser", "onConnected   MediaBrowserManager")
                         }
-
 
                         override fun onDisconnected(controller: MediaController) {
                             super.onDisconnected(controller)
@@ -118,41 +122,67 @@ internal class MediaBrowserManager private constructor() {
 
                         override fun onPlayerStateChanged(controller: MediaController, state: Int) {
                             Log.i("MediaBrowser", "onPlayerStateChanged  MediaBrowserManager")
+                            super.onPlayerStateChanged(controller, state)
                             for (callback in mMediaStatusChangeListenerList) {
                                 callback.onPlayerStateChanged(state)
                             }
-                            super.onPlayerStateChanged(controller, state)
                         }
 
                         override fun onPlaybackCompleted(controller: MediaController) {
+                            super.onPlaybackCompleted(controller)
                             Log.i("MediaBrowser", "onPlaybackCompleted  MediaBrowserManager")
                             for (callback in mMediaStatusChangeListenerList) {
                                 callback.onPlaybackCompleted()
                             }
-                            super.onPlaybackCompleted(controller)
                         }
 
                         override fun onPlaylistMetadataChanged(
                             controller: MediaController,
                             metadata: MediaMetadata?
                         ) {
-                            for (callback in mMediaStatusChangeListenerList) {
-                                callback.onPlaylistMetadataChanged(metadata)
-                            }
-                            Log.i("MediaBrowser", "onPlaylistMetadataChanged  MediaBrowserManager")
                             super.onPlaylistMetadataChanged(controller, metadata)
+                            Log.i("MediaBrowser", "onPlaylistMetadataChanged  MediaBrowserManager")
+                        }
+
+                        override fun onCurrentMediaItemChanged(
+                            controller: MediaController,
+                            item: MediaItem?
+                        ) {
+                            super.onCurrentMediaItemChanged(controller, item)
+                            item?.let {
+                                for (callback in mMediaStatusChangeListenerList) {
+                                    callback.onPlaylistMetadataChanged(item)
+                                }
+                            }
                         }
 
                         override fun onPlaybackInfoChanged(
                             controller: MediaController,
                             info: MediaController.PlaybackInfo
                         ) {
-                            Log.i("MediaBrowser", "onPlaybackInfoChanged  MediaBrowserManager")
                             super.onPlaybackInfoChanged(controller, info)
+                            Log.i("MediaBrowser", "onPlaybackInfoChanged  MediaBrowserManager")
                         }
 
                         override fun onSeekCompleted(controller: MediaController, position: Long) {
                             super.onSeekCompleted(controller, position)
+                        }
+
+                        override fun onSetCustomLayout(
+                            controller: MediaController,
+                            layout: MutableList<MediaSession.CommandButton>
+                        ): Int {
+                            return super.onSetCustomLayout(controller, layout)
+                        }
+
+                        override fun onSubtitleData(
+                            controller: MediaController,
+                            item: MediaItem,
+                            track: SessionPlayer.TrackInfo,
+                            data: SubtitleData
+                        ) {
+                            Log.i("MediaBrowser", "onSubtitleData  MediaBrowserManager")
+                            super.onSubtitleData(controller, item, track, data)
                         }
 
 
@@ -164,7 +194,6 @@ internal class MediaBrowserManager private constructor() {
 
     fun subscribe(parentId: String) {
         pause()
-        mMediaBrowser?.playlist?.clear()
         mMediaBrowser?.subscribe(parentId, null)
     }
 

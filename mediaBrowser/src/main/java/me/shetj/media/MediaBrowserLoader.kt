@@ -1,17 +1,16 @@
 package me.shetj.media
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
+import androidx.media2.common.MediaItem
 import androidx.media2.common.SessionPlayer
 import androidx.media2.session.MediaBrowser
 import androidx.media2.session.MediaLibraryService
-import androidx.media2.session.SessionCommand
 import me.shetj.media.browser.MediaBrowserManager
-import me.shetj.media.callback.NotificationHelper
 import me.shetj.media.callback.OnMediaStatusChangeListener
 import me.shetj.media.callback.OnSubscribeCallBack
 import me.shetj.media.loader.MediaBrowserHelper
-import me.shetj.media.loader.MediaConstant.Companion.COMMAND_CLEAR
 import java.util.concurrent.atomic.AtomicBoolean
 
 object MediaBrowserLoader{
@@ -34,13 +33,13 @@ object MediaBrowserLoader{
      * 获取[MediaControllerCompat]
      */
     @JvmStatic
-    fun getMediaController(): MediaBrowser? {
+    fun getMediaController(): MediaBrowser{
         checkLoaderInit()
         return browserManager.getMediaBrowser()
     }
 
     fun getLibraryRoot() {
-        getMediaController()?.getLibraryRoot(getLibraryParams(mRecent = true,mOffline = true,mSuggested = true))
+        getMediaController().getLibraryRoot(getLibraryParams(mRecent = true,mOffline = true,mSuggested = true))
     }
 
     @JvmOverloads
@@ -59,11 +58,10 @@ object MediaBrowserLoader{
     /**
      * 设置播放模式
      * 暂时 不支持
-     * TODO 替换到exoPlayer?
      */
     @JvmStatic
     private fun setRepeatMode(@SessionPlayer.RepeatMode repeatMode:Int){
-        getMediaController()?.repeatMode = repeatMode
+        getMediaController().repeatMode = repeatMode
     }
 
     /**
@@ -76,16 +74,10 @@ object MediaBrowserLoader{
         browserManager.subscribe(parentId)
     }
 
-    /**
-     * @param isClearPlayList if true will stop media and clear list
-     */
     @JvmStatic
-    fun unSubscribe(parentId:String,isClearPlayList:Boolean = true) {
+    fun unSubscribe(parentId: String) {
         checkLoaderInit()
         browserManager.unSubscribe(parentId)
-        if (isClearPlayList) {
-            getMediaController()?.sendCustomCommand(SessionCommand(COMMAND_CLEAR, null), null)
-        }
     }
 
     /**
@@ -95,15 +87,6 @@ object MediaBrowserLoader{
     @JvmStatic
     fun addMediaLoadDataCallBack(parentMediaId:String, callBack: OnSubscribeCallBack) :MediaBrowserLoader{
         MediaBrowserHelper.addMediaLoadDataCallBack(parentMediaId, callBack)
-        return this
-    }
-
-    /**
-     * 自定义[Notification]的构建
-     */
-    @JvmStatic
-    fun setNotificationHelper(notificationHelper: NotificationHelper):MediaBrowserLoader{
-        MediaBrowserHelper.setNotificationHelper(notificationHelper)
         return this
     }
 
@@ -136,6 +119,33 @@ object MediaBrowserLoader{
         checkLoaderInit()
         browserManager.removeOnMediaStatusListener(listener)
         return this
+    }
+
+
+    @SuppressLint("RestrictedApi")
+    fun playPosition(position:Int) {
+        getMediaController().apply {
+            if (playerState == SessionPlayer.PLAYER_STATE_PLAYING) {
+                pause()
+            }
+            skipToPlaylistItem(position) //回调
+            prepare()
+            play()
+        }
+    }
+
+
+    fun playPosition(item: MediaItem) {
+        getMediaController().apply {
+            if (playerState == SessionPlayer.PLAYER_STATE_PLAYING) {
+                pause()
+            }
+            playlist?.indexOf(item)?.apply {
+                skipToPlaylistItem(this)
+                prepare()
+                play()
+            }
+        }
     }
 
     /***********************************私有方法***************************************************/

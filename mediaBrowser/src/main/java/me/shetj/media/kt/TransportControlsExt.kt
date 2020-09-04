@@ -1,20 +1,20 @@
 package me.shetj.media.kt
 
 import android.support.v4.media.session.MediaControllerCompat
-import android.support.v4.media.session.PlaybackStateCompat
+import androidx.media2.common.SessionPlayer.PLAYER_STATE_PAUSED
+import androidx.media2.common.SessionPlayer.PLAYER_STATE_PLAYING
 import me.shetj.media.MediaBrowserLoader
 
-
-fun MediaControllerCompat.TransportControls.startOrPause(){
-    when(MediaBrowserLoader.getMediaController()?.playerState){
-        PlaybackStateCompat.STATE_PLAYING ->{
-            pause()
+fun startOrPause(){
+    when(MediaBrowserLoader.getMediaController().playerState){
+        PLAYER_STATE_PAUSED ->{
+            MediaBrowserLoader.getMediaController().play()
         }
-        PlaybackStateCompat.STATE_PAUSED ->{
-            play()
+        PLAYER_STATE_PLAYING ->{
+            MediaBrowserLoader.getMediaController().pause()
         }
         else ->{
-            play()
+            MediaBrowserLoader.getMediaController().play()
         }
     }
 }

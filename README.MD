@@ -81,7 +81,7 @@ dependencies {
 ```
 控制播放
 ```
-    MediaBrowserLoader.startOrPause()
+     startOrPause()
 ```
 
 [具体方法](./mediaBrowser/src/main/java/me/shetj/media/MediaBrowserLoader.kt)
