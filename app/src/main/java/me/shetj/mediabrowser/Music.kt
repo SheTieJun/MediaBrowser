@@ -9,4 +9,5 @@ class Music {
     var url: String? = null
     var duration: Long = 0
     var img: String? = null
+    var arist:String?=null
 }

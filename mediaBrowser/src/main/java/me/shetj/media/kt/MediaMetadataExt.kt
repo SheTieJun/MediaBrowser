@@ -1,5 +1,6 @@
 package me.shetj.media.kt
 
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.ParcelFileDescriptor
 import android.os.ParcelFileDescriptor.MODE_READ_ONLY
@@ -7,6 +8,7 @@ import android.os.ParcelFileDescriptor.MODE_READ_WRITE
 import androidx.media2.common.FileMediaItem
 import androidx.media2.common.MediaItem
 import androidx.media2.common.MediaMetadata
+import androidx.media2.common.MediaMetadata.METADATA_KEY_ALBUM_ART
 import androidx.media2.common.UriMediaItem
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -20,8 +22,9 @@ fun MediaMetadata.toMediaItem():MediaItem{
 }
 
 fun getMediaMetadataCompat(mediaId: String = "",
-                           album: String = "https://www.google.com/url?sa=i&url=http%3A%2F%2Fpic.netbian.com%2Ftupian%2F4780.html&psig=AOvVaw3XAWdpJgCAlXCkk5VdUNa-&ust=1599277872026000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCMDRz7zMzusCFQAAAAAdAAAAABAN",
-                           artist: String = "",
+                           album: String ="",
+                           album_art:Bitmap?=null,
+                           artist: String? = "作家名称",
                            duration: Long = 0L,
                            durationUnit: TimeUnit,
                            genre: String= "",
@@ -38,6 +41,7 @@ fun getMediaMetadataCompat(mediaId: String = "",
         .putString(MediaMetadata.METADATA_KEY_ALBUM_ART_URI, album)
         .putString(MediaMetadata.METADATA_KEY_DISPLAY_ICON_URI, album)
         .putString(MediaMetadata.METADATA_KEY_TITLE, title)
+        .putBitmap(METADATA_KEY_ALBUM_ART,album_art)
         .build()
 }
 

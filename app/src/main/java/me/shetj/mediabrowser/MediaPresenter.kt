@@ -40,6 +40,9 @@ class MediaPresenter(view: IView) : BasePresenter<MediaModel>(view) {
                         cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION))
                     val album =
                         cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM))
+
+                    val arist =
+                        cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST))
                     if (duration in 1000..2000000) {
                         val music = Music()
                         music.name = title
@@ -47,6 +50,7 @@ class MediaPresenter(view: IView) : BasePresenter<MediaModel>(view) {
                         music.url = url
                         music.duration = duration
                         music.img = album
+                        music.arist = arist
                         musicList.add(music)
                     }
                 } while (cursor.moveToNext())

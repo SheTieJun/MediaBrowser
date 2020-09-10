@@ -1,10 +1,14 @@
 package me.shetj.mediabrowser
 
 import android.Manifest
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
-import androidx.media2.common.*
 import androidx.media2.common.BaseResult.RESULT_SUCCESS
+import androidx.media2.common.MediaItem
+import androidx.media2.common.MediaMetadata
+import androidx.media2.common.SessionPlayer
+import androidx.media2.common.UriMediaItem
 import androidx.media2.session.MediaController
 import androidx.media2.session.MediaLibraryService
 import androidx.media2.session.MediaSession
@@ -61,7 +65,7 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
                     parentId: String,
                     params: MediaLibraryService.LibraryParams?
                 ): Int {
-                    Log.i("MediaBrowser","onSubscribe  $parentId MainActivity"  )
+                    Log.i("MediaBrowser", "onSubscribe  $parentId MainActivity")
                     val list = MusicUtils.loadFileData(rxContext).map {
                         //本地音频
                         ArrayList<MediaItem>().apply {
@@ -83,7 +87,7 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
                         "网路：温暖春天的爱情",
                         100 * 1000
                     )
-                    sessionPlayer.setPlaylist(list,null )
+                    sessionPlayer.setPlaylist(list, null)
                     return RESULT_SUCCESS
                 }
             })
@@ -97,25 +101,25 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
             ): Int {
                 //如果在这里进行网络请求必须，要求网络时同步请求
                 mPresenter?.loadNetMusic {
-                        it?.map { music ->
-                            createMediaItemAlbum(music)
-                        }?.apply {
-                            sessionPlayer.setPlaylist(this,null)
-                        }
+                    it?.map { music ->
+                        createMediaItemAlbum(music)
+                    }?.apply {
+                        sessionPlayer.setPlaylist(this, null)
                     }
+                }
                 return RESULT_SUCCESS
             }
         })
 
     }
 
-    fun String?.showLog(){
-        Log.i("MediaBrowser",this)
+    fun String?.showLog() {
+        Log.i("MediaBrowser", this)
     }
 
     override fun initData() {
         mPresenter = MediaPresenter(this)
-        mAdapter = MusicAdapter(MediaBrowserLoader.getMediaController().playlist ?:ArrayList())
+        mAdapter = MusicAdapter(MediaBrowserLoader.getMediaController().playlist ?: ArrayList())
         iRecyclerView.adapter = mAdapter
         mAdapter.setOnItemClickListener { _, _, position ->
             run {
@@ -133,25 +137,30 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
     //region 创建MediaItem
     private fun createMediaItemAlbum(music: Music): UriMediaItem {
         return getMediaMetadataCompat(
-            mediaId = music.name!!,
             album = music.img!!,
+            album_art = if (music.img == null) {
+                BitmapFactory.decodeResource(resources, R.mipmap.shetj_logo)
+            } else {
+                BitmapFactory.decodeFile(music.img)
+            },
+            mediaId = music.name!!,
             duration = music.duration,
             durationUnit = TimeUnit.MILLISECONDS,
             genre = "1",
-            title = music.name!!
-            , fileUrl = music.url!!
+            title = music.name!!, fileUrl = music.url!!,
+            artist = music.arist
         ).toFileItem()
     }
 
     private fun createMediaItemAlbum(music: NetMusic): UriMediaItem {
-        return  getMediaMetadataCompat(
+        return getMediaMetadataCompat(
             mediaId = music.title!!,
             album = music.imgUrl!!,
             duration = 214112,
+            album_art = BitmapFactory.decodeResource(resources, R.mipmap.shetj_logo),
             durationUnit = TimeUnit.MILLISECONDS,
             genre = "1",
-            title = music.title!!
-            , fileUrl = music.url!!
+            title = music.title!!, fileUrl = music.url!!
         ).toUriItem()
     }
 
@@ -160,9 +169,7 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
         name: String,
         duration: Long
     ): MediaItem {
-
-
-       return   getMediaMetadataCompat(
+        return getMediaMetadataCompat(
             mediaId = url,
             album = "",
             duration = duration,
@@ -171,8 +178,6 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
             title = name,
             fileUrl = url
         ).toMediaItem()
-
-
     }
 
     private fun createTestUrlMetadata(
@@ -181,7 +186,7 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
         duration: Long
     ): MediaMetadata {
 
-        return   getMediaMetadataCompat(
+        return getMediaMetadataCompat(
             mediaId = url,
             album = "",
             duration = duration,
@@ -197,8 +202,8 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
     private fun subscribeLocalMusic() {
         mPresenter?.addDispose(rxPermission
             .request(
-                Manifest.permission.READ_EXTERNAL_STORAGE
-                , Manifest.permission.WRITE_EXTERNAL_STORAGE
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
             )
             .subscribe {
                 if (it) {

@@ -66,7 +66,6 @@ internal class MediaBrowserManager private constructor() {
                             for (callback in mMediaStatusChangeListenerList) {
                                 callback.connectionCallback(true)
                             }
-                            Log.i("MediaBrowser", "onConnected   MediaBrowserManager")
                         }
 
                         override fun onDisconnected(controller: MediaController) {
@@ -74,7 +73,6 @@ internal class MediaBrowserManager private constructor() {
                             for (callback in mMediaStatusChangeListenerList) {
                                 callback.connectionCallback(false)
                             }
-                            Log.i("MediaBrowser", "onDisconnected   MediaBrowserManager")
                         }
 
                         override fun onChildrenChanged(
@@ -84,7 +82,6 @@ internal class MediaBrowserManager private constructor() {
                             params: MediaLibraryService.LibraryParams?
                         ) {
                             super.onChildrenChanged(browser, parentId, itemCount, params)
-                            Log.i("MediaBrowser", "onChildrenChanged  MediaBrowserManager")
                         }
 
                         override fun onSearchResultChanged(
@@ -94,7 +91,6 @@ internal class MediaBrowserManager private constructor() {
                             params: MediaLibraryService.LibraryParams?
                         ) {
                             super.onSearchResultChanged(browser, query, itemCount, params)
-                            Log.i("MediaBrowser", "onSearchResultChanged  MediaBrowserManager")
                         }
 
                         override fun onPlaybackSpeedChanged(
@@ -102,7 +98,6 @@ internal class MediaBrowserManager private constructor() {
                             speed: Float
                         ) {
                             super.onPlaybackSpeedChanged(controller, speed)
-                            Log.i("MediaBrowser", "onPlaybackSpeedChanged  MediaBrowserManager")
                             for (callback in mMediaStatusChangeListenerList) {
                                 callback.onPlaybackSpeedChanged(controller, speed)
                             }
@@ -113,7 +108,6 @@ internal class MediaBrowserManager private constructor() {
                             list: MutableList<MediaItem>?,
                             metadata: MediaMetadata?
                         ) {
-                            Log.i("MediaBrowser", "onPlaylistChanged  MediaBrowserManager")
                             for (callback in mMediaStatusChangeListenerList) {
                                 callback.onPlaylistChanged(list, metadata)
                             }
@@ -121,7 +115,6 @@ internal class MediaBrowserManager private constructor() {
                         }
 
                         override fun onPlayerStateChanged(controller: MediaController, state: Int) {
-                            Log.i("MediaBrowser", "onPlayerStateChanged  MediaBrowserManager")
                             super.onPlayerStateChanged(controller, state)
                             for (callback in mMediaStatusChangeListenerList) {
                                 callback.onPlayerStateChanged(state)
@@ -130,7 +123,6 @@ internal class MediaBrowserManager private constructor() {
 
                         override fun onPlaybackCompleted(controller: MediaController) {
                             super.onPlaybackCompleted(controller)
-                            Log.i("MediaBrowser", "onPlaybackCompleted  MediaBrowserManager")
                             for (callback in mMediaStatusChangeListenerList) {
                                 callback.onPlaybackCompleted()
                             }
@@ -141,7 +133,6 @@ internal class MediaBrowserManager private constructor() {
                             metadata: MediaMetadata?
                         ) {
                             super.onPlaylistMetadataChanged(controller, metadata)
-                            Log.i("MediaBrowser", "onPlaylistMetadataChanged  MediaBrowserManager")
                         }
 
                         override fun onCurrentMediaItemChanged(
@@ -161,7 +152,6 @@ internal class MediaBrowserManager private constructor() {
                             info: MediaController.PlaybackInfo
                         ) {
                             super.onPlaybackInfoChanged(controller, info)
-                            Log.i("MediaBrowser", "onPlaybackInfoChanged  MediaBrowserManager")
                         }
 
                         override fun onSeekCompleted(controller: MediaController, position: Long) {
@@ -184,22 +174,17 @@ internal class MediaBrowserManager private constructor() {
                             Log.i("MediaBrowser", "onSubtitleData  MediaBrowserManager")
                             super.onSubtitleData(controller, item, track, data)
                         }
-
-
-
                     })
                 .build()
         }
     }
 
     fun subscribe(parentId: String) {
-        pause()
         mMediaBrowser?.subscribe(parentId, null)
     }
 
 
     fun unSubscribe(parentId: String) {
-        pause()
         mMediaBrowser?.unsubscribe(parentId)
     }
 
@@ -217,12 +202,6 @@ internal class MediaBrowserManager private constructor() {
      */
     fun removeOnMediaStatusListener(l: OnMediaStatusChangeListener) {
         mMediaStatusChangeListenerList.remove(l)
-    }
-
-    private fun pause() {
-        if (mMediaBrowser?.playerState == PLAYER_STATE_PLAYING) {
-            mMediaBrowser?.pause()
-        }
     }
 
 }
