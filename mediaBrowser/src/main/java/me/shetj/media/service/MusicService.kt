@@ -18,6 +18,7 @@ import me.shetj.media.loader.MediaBrowserHelper
  * MediaBrowserServiceCompat
  */
 class MusicService : MediaLibraryService() {
+    private val TAG = "MusicService"
     private var mMediaSession: MediaLibrarySession? = null
     override fun onCreate() {
         super.onCreate()
@@ -73,6 +74,7 @@ class MusicService : MediaLibraryService() {
                     session: MediaSession,
                     controller: MediaSession.ControllerInfo
                 ): Int {
+                    onUpdateNotification(session)
                     return SessionResult.RESULT_SUCCESS
                 }
 
@@ -80,6 +82,7 @@ class MusicService : MediaLibraryService() {
                     session: MediaSession,
                     controller: MediaSession.ControllerInfo
                 ): Int {
+
                     return  SessionResult.RESULT_SUCCESS
                 }
 
@@ -87,6 +90,7 @@ class MusicService : MediaLibraryService() {
                     session: MediaSession,
                     controller: MediaSession.ControllerInfo
                 ): Int {
+                    onUpdateNotification(session)
                     return SessionResult.RESULT_SUCCESS
                 }
 
@@ -94,6 +98,7 @@ class MusicService : MediaLibraryService() {
                     session: MediaSession,
                     controller: MediaSession.ControllerInfo
                 ): Int {
+                    onUpdateNotification(session)
                     return SessionResult.RESULT_SUCCESS
                 }
 
@@ -127,9 +132,6 @@ class MusicService : MediaLibraryService() {
             .setSessionActivity(MediaBrowserHelper.getActivity(this))
             .build()
     }
-
-
-    private var mMediaSessionCompat :MediaSessionCompat ? = null
 
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaLibrarySession? {

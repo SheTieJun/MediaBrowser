@@ -2,7 +2,9 @@ package me.shetj.media.browser
 
 import android.content.ComponentName
 import android.content.Context
+import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
+import androidx.annotation.FloatRange
 import androidx.core.content.ContextCompat
 import androidx.media2.common.MediaItem
 import androidx.media2.common.MediaMetadata
@@ -188,6 +190,9 @@ internal class MediaBrowserManager private constructor() {
         mMediaBrowser?.unsubscribe(parentId)
     }
 
+    fun setSpeed(@FloatRange(from = 0.01)speed:Float){
+        mMediaBrowser?.playbackSpeed = speed
+    }
 
     fun addOnMediaStatusListener(l: OnMediaStatusChangeListener) {
         if (!mMediaStatusChangeListenerList.contains(l)) {

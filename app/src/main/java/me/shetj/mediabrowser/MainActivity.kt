@@ -12,6 +12,7 @@ import androidx.media2.common.UriMediaItem
 import androidx.media2.session.MediaController
 import androidx.media2.session.MediaLibraryService
 import androidx.media2.session.MediaSession
+import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import me.shetj.base.base.BaseActivity
 import me.shetj.base.kt.getRxPermissions
@@ -243,7 +244,9 @@ class MainActivity : BaseActivity<MediaPresenter>(), OnMediaStatusChangeListener
 
     override fun onPlaylistChanged(list: MutableList<MediaItem>?, metadata: MediaMetadata?) {
         mAdapter.setNewData(list)
-        MediaBrowserLoader.getMediaController().skipToPlaylistItem(0)
+        AndroidSchedulers.mainThread().scheduleDirect({
+            MediaBrowserLoader.playPosition(mAdapter.getItem(0))
+        }, 500, TimeUnit.MILLISECONDS)
     }
 
     override fun onPlaybackCompleted() {
